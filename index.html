@@ -14,7 +14,7 @@
   --ink:#2A1A1D; --ink-2:#5B4A4D; --muted:#8A7A7C;
   --brand:#5C1A2B; --brand-tint:#F5E9EA; --on-brand:#FBF3EE; --accent:#A8452F; --blush:#F0BFAE;
   --side:#4A1522; --side-ink:#F3E3DD; --side-muted:#C9A9A6; --side-hover:rgba(255,240,235,.07);
-  --t-boda:#7A2639; --t-empresa:#B4573C; --t-wellness:#5E7048; --t-otro:#8A7A72; --t-reu:#3F5F7A;
+  --t-boda:#7A2639; --t-empresa:#B4573C; --t-wellness:#5E7048; --t-otro:#8A7A72; --t-reu:#3F5F7A; --ch-1:#A8344F; --ch-2:#0A82A8;
   --ok:#2F6B3E; --ok-bg:#E5F0E3; --warn:#8A5A12; --warn-bg:#F8ECD3; --off:#6E6265; --off-bg:#EEE8E4; --bad:#A12E2E; --bad-bg:#F8E1DF;
   --display:'Fraunces', Georgia, 'Times New Roman', serif;
   --ui:'DM Sans', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
@@ -25,7 +25,7 @@
   --ink:#F2E8E3; --ink-2:#D2C3BE; --muted:#A08F8B;
   --brand:#5C1A2B; --brand-tint:#3A1C24; --on-brand:#FBF3EE; --accent:#E88E72; --blush:#F0BFAE;
   --side:#4A1522; --side-ink:#F3E3DD; --side-muted:#C9A9A6; --side-hover:rgba(255,240,235,.06);
-  --t-boda:#E59AA6; --t-empresa:#E88E72; --t-wellness:#A9C08A; --t-otro:#B9A9A1; --t-reu:#9DB8D0;
+  --t-boda:#E59AA6; --t-empresa:#E88E72; --t-wellness:#A9C08A; --t-otro:#B9A9A1; --t-reu:#9DB8D0; --ch-1:#CF6681; --ch-2:#2C9DC6;
   --ok:#9FCB9F; --ok-bg:#1F3326; --warn:#E9C27A; --warn-bg:#382B14; --off:#BCAEAA; --off-bg:#2C2326; --bad:#F0A3A3; --bad-bg:#3F2023;
   --shadow:none; color-scheme:dark }}
 :root[data-theme="dark"]{
@@ -33,7 +33,7 @@
   --ink:#F2E8E3; --ink-2:#D2C3BE; --muted:#A08F8B;
   --brand:#5C1A2B; --brand-tint:#3A1C24; --on-brand:#FBF3EE; --accent:#E88E72; --blush:#F0BFAE;
   --side:#4A1522; --side-ink:#F3E3DD; --side-muted:#C9A9A6; --side-hover:rgba(255,240,235,.06);
-  --t-boda:#E59AA6; --t-empresa:#E88E72; --t-wellness:#A9C08A; --t-otro:#B9A9A1; --t-reu:#9DB8D0;
+  --t-boda:#E59AA6; --t-empresa:#E88E72; --t-wellness:#A9C08A; --t-otro:#B9A9A1; --t-reu:#9DB8D0; --ch-1:#CF6681; --ch-2:#2C9DC6;
   --ok:#9FCB9F; --ok-bg:#1F3326; --warn:#E9C27A; --warn-bg:#382B14; --off:#BCAEAA; --off-bg:#2C2326; --bad:#F0A3A3; --bad-bg:#3F2023;
   --shadow:none; color-scheme:dark }
 *{box-sizing:border-box}
@@ -192,6 +192,28 @@ tr.link:hover td{background:var(--sunk)}
 .seg button{border:0;background:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 .ag-f{padding:12px 18px 0}
+/* gráficas de negocio */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:16px}
+.chart{display:block;width:100%;height:auto;overflow:visible}
+.chart text{font-family:var(--ui)}
+.chart .bk{transition:opacity .15s}
+.chart:hover .bk{opacity:.55}.chart .bk:hover{opacity:1}
+.ch-note{font-size:12px;color:var(--muted);margin-top:10px}
+.hb{display:grid;grid-template-columns:96px 1fr auto;align-items:center;gap:10px 12px}
+.hb .lb{font-size:13px;font-weight:600;color:var(--ink-2)}
+.hb .tr{height:14px;background:var(--sunk);border-radius:4px;overflow:hidden}
+.hb .fl{height:100%;background:var(--ch-1);border-radius:0 4px 4px 0}
+.hb .vv{font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+.hb .vv b{color:var(--ink)}
+.meter{display:flex;height:10px;border-radius:5px;overflow:hidden;gap:2px;background:var(--surface)}
+.meter span{display:block;height:100%}
+.tip{position:fixed;z-index:80;pointer-events:none;background:var(--ink);color:var(--surface);font-size:12px;font-weight:600;padding:6px 9px;border-radius:7px;box-shadow:0 6px 20px rgba(0,0,0,.18);white-space:nowrap;transform:translate(-50%,calc(-100% - 10px))}
+@media (prefers-reduced-motion:no-preference){
+  .grow .bk{transform-box:fill-box;transform-origin:50% 100%;animation:barUp .7s cubic-bezier(.2,.8,.2,1) both}
+  .grow .fl{transform-origin:0 50%;animation:barRight .8s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes barUp{from{transform:scaleY(0)}}
+  @keyframes barRight{from{transform:scaleX(0)}}
+}
 
 /* ficha */
 .hero-ev{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
@@ -389,6 +411,7 @@ img{max-width:100%}
 </div>
 <div id="modal-root"></div>
 <div id="viewer-root"></div>
+<div id="tip" class="tip" hidden></div>
 <div id="toast" class="toast" hidden></div>
 <canvas id="fx" aria-hidden="true"></canvas>
 
@@ -834,17 +857,59 @@ function vNegocio(){const h=hist(),n=neg();
   const months=[];for(let i=0;i<12;i++){const d=new Date(today.getFullYear(),today.getMonth()+i,1);months.push({k:iso(d).slice(0,7),lab:fmt(iso(d),{month:'short'}).replace('.','').slice(0,3),cob:0,pen:0,ev:0})}
   S.eventos.forEach(e=>{if(e.estado==='cancelado')return;(e.pagos||[]).forEach(p=>{const mo=months.find(x=>x.k===(p.fecha||'').slice(0,7));if(mo){p.pagado?mo.cob+=N(p.importe):mo.pen+=N(p.importe)}});const me=months.find(x=>x.k===e.fecha.slice(0,7));if(me)me.ev+=N(e.importe)});
   const hasPay=months.some(x=>x.cob||x.pen);const vals=months.map(x=>hasPay?x.cob+x.pen:x.ev);const mx=Math.max(...vals,1);
-  const W=640,H=200,pb=26,bw=W/12;let ch=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Ingresos previstos por mes">`;
+  const W=640,H=200,pb=26,bw=W/12;let ch=`<svg class="chart${S.anim?' grow':''}" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Ingresos previstos por mes">`;
   [0,.5,1].forEach(k=>{const y=H-pb-k*(H-pb-14);ch+=`<line x1="0" x2="${W}" y1="${y}" y2="${y}" stroke="var(--line)"/>`});
-  months.forEach((x,i)=>{const X=i*bw+bw*.22,w=bw*.56;if(hasPay){const hc=x.cob/mx*(H-pb-14),hp=x.pen/mx*(H-pb-14);ch+=`<rect x="${X}" y="${H-pb-hc}" width="${w}" height="${hc}" fill="var(--ok)" rx="2"><title>${x.lab}: cobrado ${eur(x.cob)}</title></rect><rect x="${X}" y="${H-pb-hc-hp}" width="${w}" height="${hp}" fill="var(--accent)" rx="2"><title>${x.lab}: pendiente ${eur(x.pen)}</title></rect>`}
-    else{const hh=x.ev/mx*(H-pb-14);ch+=`<rect x="${X}" y="${H-pb-hh}" width="${w}" height="${hh}" fill="var(--accent)" rx="2"><title>${x.lab}: ${eur(x.ev)}</title></rect>`}
+  months.forEach((x,i)=>{const X=i*bw+bw*.22,w=bw*.56;if(hasPay){const hc=x.cob/mx*(H-pb-14),hp=x.pen/mx*(H-pb-14);ch+=`<rect class="bk" style="animation-delay:${i*50}ms" x="${X}" y="${H-pb-hc}" width="${w}" height="${hc}" fill="var(--ok)" rx="3" data-tip="${x.lab}: cobrado ${eur(x.cob)}"/><rect class="bk" style="animation-delay:${i*50}ms" x="${X}" y="${H-pb-hc-hp}" width="${w}" height="${Math.max(0,hp-2)}" fill="var(--accent)" rx="3" data-tip="${x.lab}: pendiente ${eur(x.pen)}"/>`}
+    else{const hh=x.ev/mx*(H-pb-14);ch+=`<rect class="bk" style="animation-delay:${i*50}ms" x="${X}" y="${H-pb-hh}" width="${w}" height="${hh}" fill="var(--ch-1)" rx="3" data-tip="${x.lab}: ${eur(x.ev)}"/>`}
     ch+=`<text x="${X+w/2}" y="${H-8}" font-size="11" text-anchor="middle" fill="var(--muted)" font-family="DM Sans, sans-serif">${x.lab}</text>`});ch+='</svg>';
   const anyVal=vals.some(v=>v>0);
+  const G=S.anim?' grow':'';
+  // KPI
+  const prevY=h[h.length-2];const mPrev=prevY&&prevY.meses?prevY.facturacion/prevY.meses:0;const crec=mPrev?media/mPrev-1:null;
+  const up=S.eventos.filter(e=>e.estado!=='cancelado'&&e.fecha>=TODAY);const cartera=up.reduce((a,e)=>a+N(e.importe),0);
+  const kpis=`<div class="kpis">
+    <div class="card kpi"><p class="lab">${ic('euro')}Facturación ${last?last.anio:''}</p><p class="val num">${eur(last?last.facturacion:0)}</p><p class="foot">${last?`${last.meses} meses`:''}</p></div>
+    <div class="card kpi"><p class="lab">${ic('negocio')}Media al mes</p><p class="val num">${eur(media)}</p><p class="foot">${crec!=null?`${crec>=0?'+':''}${Math.round(crec*100)} % frente a ${prevY.anio}`:'Sin año anterior'}</p></div>
+    <div class="card kpi feature"><p class="lab">${ic('spark')}Previsión 12 meses</p><p class="val num">${eur(prev12)}</p><p class="foot">Creciendo un ${Math.round(N(n.crecimiento)*100)} %</p></div>
+    <div class="card kpi"><p class="lab">${ic('agenda')}Cartera confirmada</p><p class="val num">${eur(cartera)}</p><p class="foot">${up.length} evento${up.length===1?'':'s'} por delante</p></div></div>`;
+  const kE=v=>v>=1000?(v/1000).toLocaleString('es-ES',{maximumFractionDigits:1})+' k€':eur(v);
+  const T=(x,y,s,o='')=>`<text x="${x}" y="${y}" text-anchor="middle" ${o}>${s}</text>`;
+  // 1) media mensual por año + previsión
+  const serie=h.filter(r=>r.meses).map(r=>({lab:String(r.anio),v:r.facturacion/r.meses,sub:''}));
+  serie.forEach((s,i)=>{if(i)s.sub=(s.v/serie[i-1].v-1>=0?'+':'')+Math.round((s.v/serie[i-1].v-1)*100)+' %'});
+  if(serie.length)serie.push({lab:'Próx. 12 m',v:prevMes,sub:`+${Math.round(N(n.crecimiento)*100)} %`,f:1});
+  let c1='';if(serie.length){const W=560,H=240,top=30,bot=46,ih=H-top-bot,mx1=Math.max(...serie.map(s=>s.v),1),bw=W/serie.length,w=Math.min(84,bw*.52);
+    c1=`<svg class="chart${G}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Facturación media al mes por año"><defs><pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" fill="color-mix(in srgb,var(--ch-1) 22%,var(--surface))"/><line x1="0" y1="0" x2="0" y2="7" stroke="var(--ch-1)" stroke-width="2.5"/></pattern></defs>
+      <line x1="0" x2="${W}" y1="${top+ih}" y2="${top+ih}" stroke="var(--line-2)"/>`;
+    serie.forEach((s,i)=>{const hh=Math.max(2,s.v/mx1*ih),x=i*bw+(bw-w)/2,y=top+ih-hh;
+      c1+=`<path class="bk" style="animation-delay:${i*90}ms" d="M${x},${top+ih} V${y+4} Q${x},${y} ${x+4},${y} H${x+w-4} Q${x+w},${y} ${x+w},${y+4} V${top+ih} Z" fill="${s.f?'url(#hatch)':'var(--ch-1)'}" ${s.f?'stroke="var(--ch-1)" stroke-width="1.5" stroke-dasharray="4 3"':''} data-tip="${esc(s.lab)}: ${esc(eur(s.v))} al mes${s.sub?' ('+s.sub+')':''}"/>`;
+      c1+=T(x+w/2,y-9,kE(s.v),'font-size="13" font-weight="700" fill="var(--ink)"')+T(x+w/2,top+ih+18,esc(s.lab),'font-size="12" font-weight="600" fill="var(--ink-2)"')+(s.sub?T(x+w/2,top+ih+35,s.sub,'font-size="11.5" font-weight="700" fill="var(--ok)"'):'')});
+    c1+='</svg>'}
+  // 2) bodas y eventos por año
+  const yrs=h.filter(r=>r.bodas||r.eventos);let c2='';
+  if(yrs.length){const W=560,H=240,top=26,bot=30,ih=H-top-bot,mx2=Math.max(...yrs.flatMap(r=>[N(r.bodas),N(r.eventos)]),1),gw=W/yrs.length,w=Math.min(52,gw*.26);
+    c2=`<svg class="chart${G}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Bodas y eventos por año"><line x1="0" x2="${W}" y1="${top+ih}" y2="${top+ih}" stroke="var(--line-2)"/>`;
+    yrs.forEach((r,i)=>{const cx=i*gw+gw/2;[['bodas','var(--ch-1)','Bodas',-1],['eventos','var(--ch-2)','Empresa y otros',1]].forEach(([k,col,nm,sd],j)=>{const v=N(r[k]),hh=Math.max(v?2:0,v/mx2*ih),x=sd<0?cx-w-1:cx+1,y=top+ih-hh;
+        c2+=`<path class="bk" style="animation-delay:${i*120+j*60}ms" d="M${x},${top+ih} V${y+4} Q${x},${y} ${x+4},${y} H${x+w-4} Q${x+w},${y} ${x+w},${y+4} V${top+ih} Z" fill="${col}" data-tip="${r.anio} · ${nm}: ${v}${r.meses<12?` (${r.meses} meses)`:''}"/>`+T(x+w/2,y-8,v,'font-size="13" font-weight="700" fill="var(--ink)"')});
+      c2+=T(cx,top+ih+19,r.anio+(r.meses<12?` · ${r.meses} m`:''),'font-size="12" font-weight="600" fill="var(--ink-2)"')});
+    c2+='</svg>'}
+  // 3) próximos eventos por tipo + Groove
+  const byT=Object.keys(TIPOS).map(t=>{const l=up.filter(e=>e.tipo===t);return {t,n:l.length,imp:l.reduce((a,e)=>a+N(e.importe),0)}}).filter(x=>x.n);const mx3=Math.max(...byT.map(x=>x.n),1);
+  const inG=up.filter(e=>e.lugar==='groove').length,pG=up.length?Math.round(inG/up.length*100):0;
+  const c3=byT.length?`<div class="hb${G}">${byT.map((x,i)=>`<span class="lb">${esc(TIPOS[x.t])}</span><span class="tr" data-tip="${esc(TIPOS[x.t])}: ${x.n} evento${x.n===1?'':'s'} · ${esc(eur(x.imp))}"><span class="fl" style="display:block;width:${x.n/mx3*100}%;animation-delay:${i*90}ms"></span></span><span class="vv"><b>${x.n}</b>${x.imp?` · ${kE(x.imp)}`:''}</span>`).join('')}</div>
+    <div style="margin-top:18px"><div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600;color:var(--ink-2);margin-bottom:6px"><span>En Groove · ${pG} %</span><span>Otros espacios · ${100-pG} %</span></div>
+    <div class="meter" data-tip="${inG} de ${up.length} eventos en Groove"><span style="width:${pG}%;background:var(--ch-1)"></span><span style="flex:1;background:var(--ch-2)"></span></div></div>`:'<div class="empty small">Sin eventos por delante.</div>';
   return `${ph('Negocio','Histórico, ingresos previstos y propuesta a Groove. Los cambios se guardan solos.')}
+  ${kpis}
   <div class="grid g-2">
-    <div class="card"><div class="card-h"><h3>Histórico anual</h3><button class="btn sm" data-act="add-year">${ic('plus')}Año</button></div><div class="tbl-wrap">${h.length?`<table><thead><tr><th>Año</th><th>Bodas</th><th>Eventos</th><th>Facturación €</th><th>Meses</th><th class="r">Media/mes</th><th class="r">Crec.</th><th></th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty small">Sin datos.</div>'}</div><div class="card-b small muted" style="border-top:1px solid var(--line)">«Meses» son los meses contados ese año: 9 si el año va por septiembre.</div></div>
+    <div class="card"><div class="card-h"><h3>Facturación media al mes</h3><span class="sub">Rayado: previsión</span></div><div class="card-b">${c1||'<div class="empty small">Añadid el histórico anual.</div>'}</div></div>
+    <div class="card"><div class="card-h"><h3>Bodas y eventos por año</h3><div class="legend"><span><span class="dot" style="background:var(--ch-1)"></span>Bodas</span><span><span class="dot" style="background:var(--ch-2)"></span>Empresa y otros</span></div></div><div class="card-b">${c2||'<div class="empty small">Añadid el histórico anual.</div>'}</div></div>
+  </div>
+  <div class="grid g-2">
+    <div class="card"><div class="card-h"><h3>Próximos eventos por tipo</h3><span class="sub">${up.length} en total</span></div><div class="card-b">${c3}</div></div>
     <div class="card"><div class="card-h"><h3>${hasPay?'Cobros previstos por mes':'Facturación prevista por mes'}</h3>${hasPay?`<div class="legend"><span><span class="dot" style="background:var(--ok)"></span>Cobrado</span><span><span class="dot" style="background:var(--accent)"></span>Pendiente</span></div>`:''}</div><div class="card-b">${anyVal?ch:`<div class="empty small">Añadid importes a los eventos (o planes de pago) para ver aquí los ingresos de los próximos 12 meses.</div>`}</div></div>
   </div>
+  <div class="card" style="margin-bottom:16px"><div class="card-h"><h3>Histórico anual</h3><button class="btn sm" data-act="add-year">${ic('plus')}Año</button></div><div class="tbl-wrap">${h.length?`<table><thead><tr><th>Año</th><th>Bodas</th><th>Eventos</th><th>Facturación €</th><th>Meses</th><th class="r">Media/mes</th><th class="r">Crec.</th><th></th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty small">Sin datos.</div>'}</div><div class="card-b small muted" style="border-top:1px solid var(--line)">«Meses» son los meses contados ese año: 9 si el año va por septiembre.</div></div>
   <div class="card"><div class="card-h"><h3>Previsión y propuesta a Groove</h3></div><div class="card-b" style="display:flex;flex-direction:column;gap:16px">
     <div class="fields" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">
       <div class="field"><label for="n-crec">Crecimiento previsto (%)</label><input class="inp num" id="n-crec" data-neg="crecimiento" data-pct="1" type="number" step="5" value="${Math.round(N(n.crecimiento)*100)}"></div>
@@ -908,6 +973,9 @@ main.addEventListener('click',async ev=>{const t=ev.target.closest('button,[data
   else if(a==='add-year'){const h=hist();const y=h.length?h[h.length-1].anio+1:today.getFullYear();h.push({anio:y,bodas:0,eventos:0,facturacion:0,meses:12});saveNeg({historico:h})}
   else if(a.startsWith('csv-'))exportCSV(a.slice(4));
 });
+/* tooltip de gráficas */
+(()=>{const tip=document.getElementById('tip');const show=e=>{const t=e.target.closest&&e.target.closest('[data-tip]');if(!t){tip.hidden=true;return}tip.textContent=t.dataset.tip;tip.hidden=false;const x=Math.min(innerWidth-90,Math.max(90,e.clientX));tip.style.left=x+'px';tip.style.top=e.clientY+'px'};
+  main.addEventListener('pointermove',show);main.addEventListener('pointerdown',show);main.addEventListener('pointerleave',()=>tip.hidden=true);addEventListener('scroll',()=>tip.hidden=true,{passive:true})})();
 main.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.kc,.co-card')){e.preventDefault();e.target.click()}});
 main.addEventListener('change',async ev=>{const t=ev.target,d=t.dataset;
   if(d.task){const [eid,tid]=d.task.split('|');const e=S.eventos.find(x=>x.id===eid);if(e)await patchEv(e,{tareas:(e.tareas||[]).map(x=>x.id===tid?{...x,hecha:t.checked}:x)});return}
