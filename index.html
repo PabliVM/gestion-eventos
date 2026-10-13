@@ -318,6 +318,19 @@ a.btn{text-decoration:none}
 .vw-page span{position:absolute;right:8px;bottom:6px;font-size:11px;font-weight:700;color:#fff;background:rgba(0,0,0,.4);border-radius:999px;padding:1px 7px}
 .vw-img{width:100%;max-width:1400px;height:auto;display:block}
 .vw-msg{color:#F3E3DD;text-align:center;margin-top:20vh;line-height:1.6}
+.who-page{position:fixed;inset:0;z-index:90;background:radial-gradient(120% 90% at 85% 10%,#7A2639 0%,#4A1522 55%,#3A0F1A 100%);display:grid;place-items:center;padding:24px 16px}
+.who-in{width:100%;max-width:560px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.who-brand{font-family:var(--display);font-size:22px;font-weight:600;color:#F3E3DD}
+.who-sub{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#C9A9A6}
+.who-q{font-family:var(--display);font-size:clamp(34px,7vw,52px);font-weight:600;color:#FFF4EF;margin:36px 0 28px;letter-spacing:-.01em}
+.who-opts{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%}
+.who-opt{display:flex;flex-direction:column;align-items:center;gap:14px;padding:28px 16px;border-radius:18px;border:1px solid rgba(240,191,174,.28);background:rgba(255,244,239,.06);color:#FFF4EF;cursor:pointer;font:inherit}
+.who-opt:hover,.who-opt:focus-visible{background:rgba(240,191,174,.16);border-color:#F0BFAE;outline:none}
+.who-opt b{font-family:var(--display);font-size:24px;font-weight:600}
+.who-av{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:#F0BFAE;color:#5C1A2B;font-family:var(--display);font-size:30px;font-weight:600}
+@media (prefers-reduced-motion:no-preference){.who-opt{transition:background .15s,border-color .15s,transform .15s}.who-opt:hover{transform:translateY(-2px)}}
+.me-change{margin-left:auto;border:0;background:none;color:var(--side-muted);font:inherit;font-size:12px;text-decoration:underline;cursor:pointer;padding:0}
+.me-change:hover{color:var(--side-ink)}
 #fx{position:fixed;inset:0;pointer-events:none;z-index:50}
 @media (prefers-reduced-motion:no-preference){
   .fade{animation:fadeUp .28s ease both}
@@ -338,10 +351,21 @@ img{max-width:100%}
     <nav class="menu" id="menu" aria-label="Secciones"></nav>
     <div class="side-foot">
       <button class="btn sm" id="export-all" hidden style="background:transparent;color:var(--side-ink);border-color:rgba(240,191,174,.3)">Exportar todo</button>
-      <div class="who"><span class="av">L</span><span class="av">C</span><span>Laura y Cris</span></div>
+      <div class="who"><span class="av" id="me-av">L</span><span id="me-name">Laura y Cris</span><button class="me-change" id="me-change">Cambiar</button></div>
     </div>
   </aside>
   <main id="main"><div class="empty">Cargando…</div></main>
+</div>
+<div id="who" class="who-page" hidden>
+  <div class="who-in">
+    <p class="who-brand">El Broche Final</p>
+    <p class="who-sub">Gestión de eventos</p>
+    <h1 class="who-q">¿Quién eres?</h1>
+    <div class="who-opts">
+      <button class="who-opt" data-who="Laura"><span class="who-av">L</span><b>Laura</b></button>
+      <button class="who-opt" data-who="Cris"><span class="who-av">C</span><b>Cris</b></button>
+    </div>
+  </div>
 </div>
 <div id="modal-root"></div>
 <div id="viewer-root"></div>
@@ -425,6 +449,15 @@ const hist=()=>((S.negocio&&S.negocio.historico)||[]).slice().sort((a,b)=>a.anio
 const neg=()=>Object.assign({crecimiento:.5,fijo:45000,personas:2,bonus:4000},S.negocio||{});
 const curEv=()=>S.eventos.find(e=>e.id===S.evId);
 
+/* ===================== usuaria ===================== */
+S.me=(()=>{try{return localStorage.getItem('ebf-me')}catch(e){return null}})();
+function showWho(){const w=document.getElementById('who');w.hidden=false;document.body.style.overflow='hidden';w.querySelector('.who-opt')?.focus()}
+function setMe(n){S.me=n;try{localStorage.setItem('ebf-me',n)}catch(e){}document.getElementById('who').hidden=true;document.body.style.overflow='';paintMe();S.anim=true;render();toast('Hola, '+n)}
+function paintMe(){const a=document.getElementById('me-av'),t=document.getElementById('me-name');if(a)a.textContent=(S.me||'L').charAt(0);if(t)t.textContent=S.me||'Laura y Cris'}
+document.getElementById('who').addEventListener('click',e=>{const b=e.target.closest('[data-who]');if(b)setMe(b.dataset.who)});
+document.getElementById('me-change').onclick=showWho;
+paintMe();if(!S.me)showWho();
+
 /* ===================== navegación ===================== */
 const VIEWS=[['panel','Panel'],['agenda','Agenda'],['eventos','Eventos'],['contactos','Contactos'],['colaboraciones','Colaboraciones'],['proveedores','Proveedores'],['negocio','Negocio']];
 function renderMenu(){const late=S.contactos.filter(c=>['nuevo','contactado','presupuesto'].includes(c.estado)&&c.siguiente&&c.siguiente<TODAY).length;
@@ -461,7 +494,7 @@ function vPanel(){
   // tareas próximas
   const tasks=[];up.forEach(e=>(e.tareas||[]).forEach(t=>{if(!t.hecha&&t.fecha&&t.fecha<=addDays(TODAY,21))tasks.push({...t,ev:e})}));tasks.sort((a,b)=>a.fecha.localeCompare(b.fecha));
   return `
-  ${ph(`${greeting()}, Laura y Cris`,esc(fLong(TODAY)),`<button class="btn" data-act="new-contacto">${ic('plus')}Contacto</button><button class="btn primary" data-act="new-evento">${ic('plus')}Nuevo evento</button>`)}
+  ${ph(`${greeting()}, ${esc(S.me||'Laura y Cris')}`,esc(fLong(TODAY)),`<button class="btn" data-act="new-contacto">${ic('plus')}Contacto</button><button class="btn primary" data-act="new-evento">${ic('plus')}Nuevo evento</button>`)}
   <div class="grid g-kpi">
     <div class="card kpi feature">${next?`<p class="lab">${ic('clock')}Próximo evento</p><p class="val num">${dn===0?'Hoy':dn}<small>${dn===0?'':dn===1?'día':'días'}</small></p><p class="foot">${esc(next.nombre)} · ${esc(fShort(next.fecha))}</p>`:`<p class="lab">${ic('clock')}Próximo evento</p><p class="val">—</p><p class="foot">Sin eventos próximos</p>`}</div>
     <div class="card kpi"><p class="lab">${ic('eventos')}Eventos confirmados</p><p class="val num">${conf.length}</p><p class="foot">${ny} con fecha en ${y+1}</p></div>
