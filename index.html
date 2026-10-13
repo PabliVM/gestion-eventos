@@ -14,7 +14,7 @@
   --ink:#2A1A1D; --ink-2:#5B4A4D; --muted:#8A7A7C;
   --brand:#5C1A2B; --brand-tint:#F5E9EA; --on-brand:#FBF3EE; --accent:#A8452F; --blush:#F0BFAE;
   --side:#4A1522; --side-ink:#F3E3DD; --side-muted:#C9A9A6; --side-hover:rgba(255,240,235,.07);
-  --t-boda:#7A2639; --t-empresa:#B4573C; --t-wellness:#5E7048; --t-otro:#8A7A72;
+  --t-boda:#7A2639; --t-empresa:#B4573C; --t-wellness:#5E7048; --t-otro:#8A7A72; --t-reu:#3F5F7A;
   --ok:#2F6B3E; --ok-bg:#E5F0E3; --warn:#8A5A12; --warn-bg:#F8ECD3; --off:#6E6265; --off-bg:#EEE8E4; --bad:#A12E2E; --bad-bg:#F8E1DF;
   --display:'Fraunces', Georgia, 'Times New Roman', serif;
   --ui:'DM Sans', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
@@ -25,7 +25,7 @@
   --ink:#F2E8E3; --ink-2:#D2C3BE; --muted:#A08F8B;
   --brand:#5C1A2B; --brand-tint:#3A1C24; --on-brand:#FBF3EE; --accent:#E88E72; --blush:#F0BFAE;
   --side:#4A1522; --side-ink:#F3E3DD; --side-muted:#C9A9A6; --side-hover:rgba(255,240,235,.06);
-  --t-boda:#E59AA6; --t-empresa:#E88E72; --t-wellness:#A9C08A; --t-otro:#B9A9A1;
+  --t-boda:#E59AA6; --t-empresa:#E88E72; --t-wellness:#A9C08A; --t-otro:#B9A9A1; --t-reu:#9DB8D0;
   --ok:#9FCB9F; --ok-bg:#1F3326; --warn:#E9C27A; --warn-bg:#382B14; --off:#BCAEAA; --off-bg:#2C2326; --bad:#F0A3A3; --bad-bg:#3F2023;
   --shadow:none; color-scheme:dark }}
 :root[data-theme="dark"]{
@@ -33,7 +33,7 @@
   --ink:#F2E8E3; --ink-2:#D2C3BE; --muted:#A08F8B;
   --brand:#5C1A2B; --brand-tint:#3A1C24; --on-brand:#FBF3EE; --accent:#E88E72; --blush:#F0BFAE;
   --side:#4A1522; --side-ink:#F3E3DD; --side-muted:#C9A9A6; --side-hover:rgba(255,240,235,.06);
-  --t-boda:#E59AA6; --t-empresa:#E88E72; --t-wellness:#A9C08A; --t-otro:#B9A9A1;
+  --t-boda:#E59AA6; --t-empresa:#E88E72; --t-wellness:#A9C08A; --t-otro:#B9A9A1; --t-reu:#9DB8D0;
   --ok:#9FCB9F; --ok-bg:#1F3326; --warn:#E9C27A; --warn-bg:#382B14; --off:#BCAEAA; --off-bg:#2C2326; --bad:#F0A3A3; --bad-bg:#3F2023;
   --shadow:none; color-scheme:dark }
 *{box-sizing:border-box}
@@ -145,7 +145,7 @@ tr.link:hover td{background:var(--sunk)}
 /* chips */
 .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap;line-height:1.6}
 .dot{width:8px;height:8px;border-radius:50%;flex:none;display:inline-block;background:var(--c,var(--muted))}
-.t-boda{--c:var(--t-boda)} .t-empresa{--c:var(--t-empresa)} .t-wellness{--c:var(--t-wellness)} .t-otro{--c:var(--t-otro)}
+.t-boda{--c:var(--t-boda)} .t-empresa{--c:var(--t-empresa)} .t-wellness{--c:var(--t-wellness)} .t-otro{--c:var(--t-otro)} .t-reu{--c:var(--t-reu)}
 .type{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-2);white-space:nowrap}
 .st-cerrado,.st-ganado,.st-confirmado,.st-pagado{background:var(--ok-bg);color:var(--ok)}
 .st-presupuesto,.st-contactado,.st-pendiente{background:var(--warn-bg);color:var(--warn)}
@@ -421,7 +421,7 @@ const ic=(n,cls='i')=>`<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true
 
 /* ===================== estado y utilidades ===================== */
 const S={db:null,sample:null,dl:null,ready:false,eventos:[],contactos:[],proveedores:[],negocio:null,
-  view:'panel',evId:null,coId:null,slideOpen:false,slideIdx:1,colaboraciones:[],assets:null,evTab:'resumen',calMonth:null,calSel:null,ctView:'tablero',anim:true,
+  view:'panel',evId:null,coId:null,slideOpen:false,slideIdx:1,colaboraciones:[],reuniones:[],assets:null,evTab:'resumen',calMonth:null,calSel:null,ctView:'tablero',anim:true,
   f:{q:'',anio:'proximos',tipo:'todos',estado:'todos'},pf:{q:'',cat:'todas'},
   as:{mode:'add',q:'',out:'',pending:null,busy:false}};
 const today=new Date();today.setHours(0,0,0,0);
@@ -544,7 +544,7 @@ function vPanel(){
   <div class="card"><div class="card-h"><h3>Próximos 12 meses</h3>${legend()}</div><div class="card-b tbl-wrap">${timeline(up)}</div></div>`;
 }
 function emptyEv(){return `<div class="empty">Todavía no hay eventos.<button class="btn primary" data-act="new-evento">${ic('plus')}Crear el primero</button></div>`}
-function legend(){return `<div class="legend">${Object.keys(TIPOS).map(t=>`<span class="t-${t}"><span class="dot"></span>${TIPOS[t]}</span>`).join('')}</div>`}
+function legend(){return `<div class="legend">${Object.keys(TIPOS).map(t=>`<span class="t-${t}"><span class="dot"></span>${TIPOS[t]}</span>`).join('')}<span class="t-reu"><span class="dot"></span>Reunión</span></div>`}
 function attention(up){const out=[];
   const late=S.contactos.filter(c=>['nuevo','contactado','presupuesto'].includes(c.estado)&&c.siguiente&&c.siguiente<TODAY);
   if(late.length)out.push(['bad','contactos',`${late.length} seguimiento${late.length>1?'s':''} atrasado${late.length>1?'s':''}`,late.slice(0,3).map(c=>c.nombre).join(', '),'nav:contactos']);
@@ -604,18 +604,36 @@ async function asReport(){const a=S.as;if(a.busy)return;a.busy=true;a.pending=nu
 /* ---------- AGENDA ---------- */
 function vAgenda(){const m=S.calMonth,y=m.getFullYear(),mo=m.getMonth();const first=new Date(y,mo,1);const start=new Date(y,mo,1-((first.getDay()+6)%7));
   const title=cap(new Intl.DateTimeFormat('es-ES',{month:'long',year:'numeric'}).format(m));
-  const by={};activos().forEach(e=>(by[e.fecha]=by[e.fecha]||[]).push(e));
+  const by={},rb={};activos().forEach(e=>(by[e.fecha]=by[e.fecha]||[]).push(e));reunionesAll().forEach(x=>(rb[x.fecha]=rb[x.fecha]||[]).push(x));
   let cells=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(d=>`<div class="dow">${d}</div>`).join('');
-  for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);if(i>=35&&d.getMonth()!==mo)break;const k=iso(d),evs=by[k]||[];
-    cells+=`<button class="day${d.getMonth()!==mo?' out':''}${d.getDay()===6?' sat':''}${k===TODAY?' today':''}${k===S.calSel?' sel':''}" data-day="${k}" aria-label="${esc(fLong(k))}: ${evs.length} eventos"><span class="n">${d.getDate()}</span>${evs.map(e=>`<span class="ev t-${esc(e.tipo)}">${esc(e.nombre)}</span>`).join('')}</button>`}
-  const sel=S.calSel,list=sel?(by[sel]||[]):activos().filter(e=>e.fecha.slice(0,7)===iso(first).slice(0,7)).sort((a,b)=>a.fecha.localeCompare(b.fecha));
-  return `${ph('Agenda','Calendario de eventos. Los sábados aparecen resaltados.',`<button class="btn primary" data-act="new-evento" ${sel?`data-fecha="${sel}"`:''}>${ic('plus')}Nuevo evento</button>`)}
+  for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);if(i>=35&&d.getMonth()!==mo)break;const k=iso(d),evs=by[k]||[],rs=rb[k]||[];
+    cells+=`<button class="day${d.getMonth()!==mo?' out':''}${d.getDay()===6?' sat':''}${k===TODAY?' today':''}${k===S.calSel?' sel':''}" data-day="${k}" aria-label="${esc(fLong(k))}: ${evs.length} eventos, ${rs.length} reuniones"><span class="n">${d.getDate()}</span>${rs.map(x=>`<span class="ev t-reu">${x.hora?esc(x.hora)+' ':''}${esc(x.titulo)}</span>`).join('')}${evs.map(e=>`<span class="ev t-${esc(e.tipo)}">${esc(e.nombre)}</span>`).join('')}</button>`}
+  const sel=S.calSel,ym=iso(first).slice(0,7),inR=x=>sel?x.fecha===sel:x.fecha.slice(0,7)===ym;
+  const list=[...activos().filter(inR).map(e=>({k:e.fecha+' 99',h:evRow(e)})),...reunionesAll().filter(inR).map(x=>({k:x.fecha+' '+(x.hora||'00'),h:reuRow(x)}))].sort((a,b)=>a.k.localeCompare(b.k)).map(x=>x.h);
+  return `${ph('Agenda','Calendario de eventos y reuniones. Los sábados aparecen resaltados.',`<button class="btn" data-act="new-reunion" ${sel?`data-fecha="${sel}"`:''}>${ic('plus')}Nueva reunión</button><button class="btn primary" data-act="new-evento" ${sel?`data-fecha="${sel}"`:''}>${ic('plus')}Nuevo evento</button>`)}
   <div class="grid g-main">
     <div class="card"><div class="card-h"><div class="actions"><button class="btn icon" data-cal="-1" aria-label="Mes anterior">${ic('left')}</button><button class="btn icon" data-cal="1" aria-label="Mes siguiente">${ic('right')}</button><h3 style="font-size:16px;margin-left:6px">${esc(title)}</h3></div><div class="actions">${legend()}<button class="btn sm" data-cal="0">Hoy</button></div></div>
       <div class="tbl-wrap"><div class="cal" style="min-width:420px">${cells}</div></div></div>
     <div class="card" style="align-self:start"><div class="card-h"><h3>${sel?esc(fLong(sel)):esc(title)}</h3>${sel?`<button class="btn ghost sm" data-day="${sel}">Ver mes</button>`:''}</div>
-      ${list.length?`<div class="rows">${list.map(evRow).join('')}</div>`:`<div class="empty small">${sel?'Día libre.':'Sin eventos este mes.'}${sel?`<button class="btn sm" data-act="new-evento" data-fecha="${sel}">${ic('plus')}Añadir evento este día</button>`:''}</div>`}</div>
+      ${list.length?`<div class="rows">${list.join('')}</div>`:`<div class="empty small">${sel?'Día libre.':'Sin eventos ni reuniones este mes.'}${sel?`<div class="actions"><button class="btn sm" data-act="new-reunion" data-fecha="${sel}">${ic('plus')}Reunión</button><button class="btn sm" data-act="new-evento" data-fecha="${sel}">${ic('plus')}Evento</button></div>`:''}</div>`}</div>
   </div>`}
+/* reuniones: propias + próxima reunión de cada colaboración */
+function reunionesAll(){return [...S.reuniones.filter(x=>x.fecha),...S.colaboraciones.filter(c=>c.proximaReunion&&c.estado!=='descartada').map(c=>({id:'co:'+c.id,coId:c.id,titulo:'Reunión · '+c.nombre,fecha:c.proximaReunion,hora:'',con:c.contacto||''}))]}
+function reuRow(x){return `<div class="rw link" ${x.coId?`data-co="${esc(x.coId)}"`:`data-reu="${esc(x.id)}"`}>${datebox(x.fecha)}<div class="grow"><p class="t">${esc(x.titulo)}</p><p class="s">Reunión${x.hora?' · '+esc(x.hora):''}${x.con?' · '+esc(x.con):''}${x.lugar?' · '+esc(x.lugar):''}</p></div><span class="pill t-reu" style="background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--c)">Reunión</span></div>`}
+function openReunion(x,fecha){const r=x||{fecha:fecha||TODAY,hora:''};
+  modal(x?'Editar reunión':'Nueva reunión',`
+    <div class="field full"><label for="r-t">Asunto</label><input class="inp" id="r-t" name="titulo" value="${esc(r.titulo)}" placeholder="Ej.: Reunión con Groove · Visita de agencia"></div>
+    <div class="field"><label for="r-f">Fecha</label><input class="inp" id="r-f" name="fecha" type="date" value="${esc(r.fecha)}"></div>
+    <div class="field"><label for="r-h">Hora</label><input class="inp" id="r-h" name="hora" type="time" value="${esc(r.hora)}"></div>
+    <div class="field"><label for="r-c">Con quién</label><input class="inp" id="r-c" name="con" value="${esc(r.con)}" placeholder="Persona o empresa"></div>
+    <div class="field"><label for="r-l">Lugar</label><input class="inp" id="r-l" name="lugar" value="${esc(r.lugar)}" placeholder="Groove, oficina, videollamada…"></div>
+    <div class="field full"><label for="r-n">Notas</label><textarea class="inp" id="r-n" name="notas">${esc(r.notas)}</textarea></div>`,
+  {validate:d=>!d.titulo.trim()?'Escribid el asunto de la reunión.':!/^\d{4}-\d{2}-\d{2}$/.test(d.fecha)?'Elegid una fecha.':'',
+   save:async d=>{const body={titulo:d.titulo.trim(),fecha:d.fecha,hora:d.hora||'',con:d.con.trim(),lugar:d.lugar.trim(),notas:d.notas.trim(),actualizado:new Date().toISOString()};
+     if(x){const ok=await guard(()=>S.db.doc('reuniones/'+x.id).update(body),'Reunión actualizada');if(ok){Object.assign(x,body);render()}return ok}
+     const ref=S.db?.collection('reuniones').doc();const ok=await guard(()=>ref.set({...body,creadoPor:S.me||null}),'Reunión añadida');
+     if(ok){if(!S.reuniones.some(y=>y.id===ref.id))S.reuniones.push({id:ref.id,...body});S.calSel=body.fecha;const dt=new Date(body.fecha+'T00:00');S.calMonth=new Date(dt.getFullYear(),dt.getMonth(),1);render()}return ok}},
+  x?async()=>{const ok=await guard(()=>S.db.doc('reuniones/'+x.id).delete(),'Reunión eliminada');if(ok){S.reuniones=S.reuniones.filter(y=>y.id!==x.id);render()}return ok}:null)}
 function evRow(e){const m=evm(e);return `<div class="rw link" data-open="${esc(e.id)}">${datebox(e.fecha)}<div class="grow"><p class="t">${esc(e.nombre)}</p><p class="s">${esc(TIPOS[e.tipo])}${e.lugar==='groove'?' · Groove':''}${m.tareas?` · ${m.hechas}/${m.tareas} tareas`:''}</p></div>${pill(e.estado,ESTADOS_EV)}</div>`}
 
 /* ---------- EVENTOS ---------- */
@@ -832,8 +850,9 @@ function vNegocio(){const h=hist(),n=neg();
 
 /* ===================== acciones ===================== */
 const main=document.getElementById('main');
-main.addEventListener('click',async ev=>{const t=ev.target.closest('button,[data-open],[data-ct],[data-prov],[data-go],[data-nav-to],[data-co]');if(!t||t.closest('form')&&t.type==='submit')return;const d=t.dataset;
+main.addEventListener('click',async ev=>{const t=ev.target.closest('button,[data-open],[data-ct],[data-prov],[data-go],[data-nav-to],[data-co],[data-reu]');if(!t||t.closest('form')&&t.type==='submit')return;const d=t.dataset;
   if(d.open){go('evento',d.open);return}
+  if(d.reu){const x=S.reuniones.find(y=>y.id===d.reu);if(x)openReunion(x);return}
   if(d.navTo){go(d.navTo);return}
   if(d.go){const [k,v]=d.go.split(':');k==='nav'?go(v):go('evento',v);return}
   if(d.co){S.coId=d.co;S.slideOpen=false;go('colab');return}
@@ -849,6 +868,7 @@ main.addEventListener('click',async ev=>{const t=ev.target.closest('button,[data
   const a=d.act;if(!a)return;
   if(a==='seed'){t.disabled=true;try{await window._fb.importSeed();S.needSeed=false;toast('Datos importados');render()}catch(e){console.error(e);toast('No se han podido importar');t.disabled=false}return}
   if(a==='new-evento')openEvento(null,d.fecha);
+  if(a==='new-reunion')openReunion(null,d.fecha);
   else if(a==='new-contacto')openContacto(null);
   else if(a==='new-proveedor')openProveedor(null);
   else if(a==='new-colab')openColab(null);
@@ -1023,11 +1043,11 @@ S.sample=null;S.needSeed=false;
 render();
 window.startApp=function(db){
   S.db=db;S.assets=window._fb&&window._fb.files||null;
-  const seen={};const done=k=>{if(seen[k])return false;seen[k]=1;if(Object.keys(seen).length>=5){S.ready=true;S.anim=true;S.needSeed=!S.eventos.length&&!S.colaboraciones.length&&!S.negocio;render()}return true};
+  const seen={};const done=k=>{if(seen[k])return false;seen[k]=1;if(Object.keys(seen).length>=6){S.ready=true;S.anim=true;S.needSeed=!S.eventos.length&&!S.colaboraciones.length&&!S.negocio;render()}return true};
   const refresh=()=>{if(!S.ready)return;const a=document.activeElement;if(a&&a.closest&&a.closest('#main')&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;if(document.getElementById('modal-root').innerHTML)return renderMenu();render()};
   const fail=e=>{console.error(e);S.ready=true;S.denied=e&&e.code==='permission-denied';render()};
   const sub=(name,key)=>db.collection(name).onSnapshot(s=>{S[key]=s.docs.map(d=>Object.assign({id:d.id},d.data()));if(!done(name))refresh()},fail);
-  sub('eventos','eventos');sub('contactos','contactos');sub('proveedores','proveedores');sub('colaboraciones','colaboraciones');
+  sub('eventos','eventos');sub('contactos','contactos');sub('proveedores','proveedores');sub('colaboraciones','colaboraciones');sub('reuniones','reuniones');
   db.doc('ajustes/negocio').onSnapshot(s=>{S.negocio=s.exists?Object.assign({},s.data()):null;if(!done('negocio'))refresh()},fail);
 };
 </script>
