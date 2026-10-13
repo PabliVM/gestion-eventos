@@ -191,6 +191,7 @@ tr.link:hover td{background:var(--sunk)}
 .seg{display:inline-flex;background:var(--sunk);border-radius:8px;padding:3px}
 .seg button{border:0;background:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-weight:600;font-size:12px;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.ag-f{padding:12px 18px 0}
 
 /* ficha */
 .hero-ev{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap}
@@ -617,9 +618,9 @@ function vAgenda(){const m=S.calMonth,y=m.getFullYear(),mo=m.getMonth();const fi
   const list=[...evL.filter(inR).map(e=>({k:e.fecha+' 99',h:evRow(e)})),...reL.filter(inR).map(x=>({k:x.fecha+' '+(x.hora||'00'),h:reuRow(x)}))].sort((a,b)=>a.k.localeCompare(b.k)).map(x=>x.h);
   return `${ph('Agenda','Calendario de eventos y reuniones. Los fines de semana aparecen resaltados.',`<button class="btn" data-act="new-reunion" ${sel?`data-fecha="${sel}"`:''}>${ic('plus')}Nueva reunión</button><button class="btn primary" data-act="new-evento" ${sel?`data-fecha="${sel}"`:''}>${ic('plus')}Nuevo evento</button>`)}
   <div class="grid g-main">
-    <div class="card"><div class="card-h"><div class="actions"><button class="btn icon" data-cal="-1" aria-label="Mes anterior">${ic('left')}</button><button class="btn icon" data-cal="1" aria-label="Mes siguiente">${ic('right')}</button><h3 style="font-size:16px;margin-left:6px">${esc(title)}</h3></div><div class="actions"><div class="seg" role="group" aria-label="Mostrar"><button data-agf="todo" aria-pressed="${F==='todo'}">Todo</button><button data-agf="eventos" aria-pressed="${F==='eventos'}">Eventos</button><button data-agf="reuniones" aria-pressed="${F==='reuniones'}">Reuniones</button></div>${legend()}<button class="btn sm" data-cal="0">Hoy</button></div></div>
+    <div class="card"><div class="card-h"><div class="actions"><button class="btn icon" data-cal="-1" aria-label="Mes anterior">${ic('left')}</button><button class="btn icon" data-cal="1" aria-label="Mes siguiente">${ic('right')}</button><h3 style="font-size:16px;margin-left:6px">${esc(title)}</h3></div><div class="actions">${legend()}<button class="btn sm" data-cal="0">Hoy</button></div></div>
       <div class="tbl-wrap"><div class="cal" style="min-width:420px">${cells}</div></div></div>
-    <div class="card" style="align-self:start"><div class="card-h"><h3>${sel?esc(fLong(sel)):esc(title)}</h3>${sel?`<button class="btn ghost sm" data-day="${sel}">Ver mes</button>`:''}</div>
+    <div class="card" style="align-self:start"><div class="ag-f"><div class="seg" style="display:flex" role="group" aria-label="Mostrar"><button style="flex:1" data-agf="todo" aria-pressed="${F==='todo'}">Todo</button><button style="flex:1" data-agf="eventos" aria-pressed="${F==='eventos'}">Eventos</button><button style="flex:1" data-agf="reuniones" aria-pressed="${F==='reuniones'}">Reuniones</button></div></div><div class="card-h"><h3>${sel?esc(fLong(sel)):esc(title)}</h3>${sel?`<button class="btn ghost sm" data-day="${sel}">Ver mes</button>`:''}</div>
       ${list.length?`<div class="rows">${list.join('')}</div>`:`<div class="empty small">${sel?(F==='eventos'?'Sin eventos este día.':F==='reuniones'?'Sin reuniones este día.':'Día libre.'):(F==='eventos'?'Sin eventos este mes.':F==='reuniones'?'Sin reuniones este mes.':'Sin eventos ni reuniones este mes.')}${sel?`<div class="actions"><button class="btn sm" data-act="new-reunion" data-fecha="${sel}">${ic('plus')}Reunión</button><button class="btn sm" data-act="new-evento" data-fecha="${sel}">${ic('plus')}Evento</button></div>`:''}</div>`}</div>
   </div>`}
 /* reuniones: propias + próxima reunión de cada colaboración */
