@@ -421,7 +421,7 @@ const ic=(n,cls='i')=>`<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true
 
 /* ===================== estado y utilidades ===================== */
 const S={db:null,sample:null,dl:null,ready:false,eventos:[],contactos:[],proveedores:[],negocio:null,
-  view:'panel',evId:null,coId:null,slideOpen:false,slideIdx:1,colaboraciones:[],reuniones:[],assets:null,evTab:'resumen',calMonth:null,calSel:null,ctView:'tablero',anim:true,
+  view:'panel',evId:null,coId:null,slideOpen:false,slideIdx:1,colaboraciones:[],reuniones:[],assets:null,evTab:'resumen',calMonth:null,calSel:null,agF:'todo',ctView:'tablero',anim:true,
   f:{q:'',anio:'proximos',tipo:'todos',estado:'todos'},pf:{q:'',cat:'todas'},
   as:{mode:'add',q:'',out:'',pending:null,busy:false}};
 const today=new Date();today.setHours(0,0,0,0);
@@ -604,18 +604,19 @@ async function asReport(){const a=S.as;if(a.busy)return;a.busy=true;a.pending=nu
 /* ---------- AGENDA ---------- */
 function vAgenda(){const m=S.calMonth,y=m.getFullYear(),mo=m.getMonth();const first=new Date(y,mo,1);const start=new Date(y,mo,1-((first.getDay()+6)%7));
   const title=cap(new Intl.DateTimeFormat('es-ES',{month:'long',year:'numeric'}).format(m));
-  const by={},rb={};activos().forEach(e=>(by[e.fecha]=by[e.fecha]||[]).push(e));reunionesAll().forEach(x=>(rb[x.fecha]=rb[x.fecha]||[]).push(x));
+  const F=S.agF,showE=F!=='reuniones',showR=F!=='eventos',evL=showE?activos():[],reL=showR?reunionesAll():[];
+  const by={},rb={};evL.forEach(e=>(by[e.fecha]=by[e.fecha]||[]).push(e));reL.forEach(x=>(rb[x.fecha]=rb[x.fecha]||[]).push(x));
   let cells=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(d=>`<div class="dow">${d}</div>`).join('');
   for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);if(i>=35&&d.getMonth()!==mo)break;const k=iso(d),evs=by[k]||[],rs=rb[k]||[];
     cells+=`<button class="day${d.getMonth()!==mo?' out':''}${d.getDay()===6?' sat':''}${k===TODAY?' today':''}${k===S.calSel?' sel':''}" data-day="${k}" aria-label="${esc(fLong(k))}: ${evs.length} eventos, ${rs.length} reuniones"><span class="n">${d.getDate()}</span>${rs.map(x=>`<span class="ev t-reu">${x.hora?esc(x.hora)+' ':''}${esc(x.titulo)}</span>`).join('')}${evs.map(e=>`<span class="ev t-${esc(e.tipo)}">${esc(e.nombre)}</span>`).join('')}</button>`}
   const sel=S.calSel,ym=iso(first).slice(0,7),inR=x=>sel?x.fecha===sel:x.fecha.slice(0,7)===ym;
-  const list=[...activos().filter(inR).map(e=>({k:e.fecha+' 99',h:evRow(e)})),...reunionesAll().filter(inR).map(x=>({k:x.fecha+' '+(x.hora||'00'),h:reuRow(x)}))].sort((a,b)=>a.k.localeCompare(b.k)).map(x=>x.h);
+  const list=[...evL.filter(inR).map(e=>({k:e.fecha+' 99',h:evRow(e)})),...reL.filter(inR).map(x=>({k:x.fecha+' '+(x.hora||'00'),h:reuRow(x)}))].sort((a,b)=>a.k.localeCompare(b.k)).map(x=>x.h);
   return `${ph('Agenda','Calendario de eventos y reuniones. Los sábados aparecen resaltados.',`<button class="btn" data-act="new-reunion" ${sel?`data-fecha="${sel}"`:''}>${ic('plus')}Nueva reunión</button><button class="btn primary" data-act="new-evento" ${sel?`data-fecha="${sel}"`:''}>${ic('plus')}Nuevo evento</button>`)}
   <div class="grid g-main">
-    <div class="card"><div class="card-h"><div class="actions"><button class="btn icon" data-cal="-1" aria-label="Mes anterior">${ic('left')}</button><button class="btn icon" data-cal="1" aria-label="Mes siguiente">${ic('right')}</button><h3 style="font-size:16px;margin-left:6px">${esc(title)}</h3></div><div class="actions">${legend()}<button class="btn sm" data-cal="0">Hoy</button></div></div>
+    <div class="card"><div class="card-h"><div class="actions"><button class="btn icon" data-cal="-1" aria-label="Mes anterior">${ic('left')}</button><button class="btn icon" data-cal="1" aria-label="Mes siguiente">${ic('right')}</button><h3 style="font-size:16px;margin-left:6px">${esc(title)}</h3></div><div class="actions"><div class="seg" role="group" aria-label="Mostrar"><button data-agf="todo" aria-pressed="${F==='todo'}">Todo</button><button data-agf="eventos" aria-pressed="${F==='eventos'}">Eventos</button><button data-agf="reuniones" aria-pressed="${F==='reuniones'}">Reuniones</button></div>${legend()}<button class="btn sm" data-cal="0">Hoy</button></div></div>
       <div class="tbl-wrap"><div class="cal" style="min-width:420px">${cells}</div></div></div>
     <div class="card" style="align-self:start"><div class="card-h"><h3>${sel?esc(fLong(sel)):esc(title)}</h3>${sel?`<button class="btn ghost sm" data-day="${sel}">Ver mes</button>`:''}</div>
-      ${list.length?`<div class="rows">${list.join('')}</div>`:`<div class="empty small">${sel?'Día libre.':'Sin eventos ni reuniones este mes.'}${sel?`<div class="actions"><button class="btn sm" data-act="new-reunion" data-fecha="${sel}">${ic('plus')}Reunión</button><button class="btn sm" data-act="new-evento" data-fecha="${sel}">${ic('plus')}Evento</button></div>`:''}</div>`}</div>
+      ${list.length?`<div class="rows">${list.join('')}</div>`:`<div class="empty small">${sel?(F==='eventos'?'Sin eventos este día.':F==='reuniones'?'Sin reuniones este día.':'Día libre.'):(F==='eventos'?'Sin eventos este mes.':F==='reuniones'?'Sin reuniones este mes.':'Sin eventos ni reuniones este mes.')}${sel?`<div class="actions"><button class="btn sm" data-act="new-reunion" data-fecha="${sel}">${ic('plus')}Reunión</button><button class="btn sm" data-act="new-evento" data-fecha="${sel}">${ic('plus')}Evento</button></div>`:''}</div>`}</div>
   </div>`}
 /* reuniones: propias + próxima reunión de cada colaboración */
 function reunionesAll(){return [...S.reuniones.filter(x=>x.fecha),...S.colaboraciones.filter(c=>c.proximaReunion&&c.estado!=='descartada').map(c=>({id:'co:'+c.id,coId:c.id,titulo:'Reunión · '+c.nombre,fecha:c.proximaReunion,hora:'',con:c.contacto||''}))]}
@@ -862,6 +863,7 @@ main.addEventListener('click',async ev=>{const t=ev.target.closest('button,[data
   if(d.day){S.calSel=S.calSel===d.day?null:d.day;render();return}
   if(d.evtab){S.evTab=d.evtab;render();return}
   if(d.ctview){S.ctView=d.ctview;render();return}
+  if(d.agf){S.agF=d.agf;render();return}
   if(d.del){const [field,id]=d.del.split('|');const e=curEv();await patchEv(e,{[field]:(e[field]||[]).filter(x=>x.id!==id)});return}
   if(d.conf){const e=curEv();await patchEv(e,{proveedores:(e.proveedores||[]).map(p=>p.id===d.conf?{...p,confirmado:!p.confirmado}:p)});return}
   if(d.delyear){if(t.dataset.armed){saveNeg({historico:hist().filter(r=>r.anio!==+d.delyear)})}else{t.dataset.armed=1;t.innerHTML='¿Quitar?';t.classList.add('danger');setTimeout(()=>{if(t.isConnected){delete t.dataset.armed;t.innerHTML=ic('x');t.classList.remove('danger')}},3000)}return}
