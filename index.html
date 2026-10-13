@@ -349,15 +349,24 @@ a.btn{text-decoration:none}
 .vw-pres{background:#F0BFAE!important;color:#4A1522!important;border-color:#F0BFAE!important;font-weight:700}
 .pm{position:fixed;inset:0;z-index:75;background:radial-gradient(120% 100% at 50% 0%,#2A1219 0%,#120A0D 70%);color:#F3E3DD;display:flex;flex-direction:column;user-select:none;-webkit-user-select:none}
 .pm-prog{position:absolute;top:0;left:0;right:0;height:3px;background:rgba(240,191,174,.12);z-index:4}
-.pm-prog i{display:block;height:100%;width:0;background:#F0BFAE;transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.pm-prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#A8452F,#F0BFAE);box-shadow:0 0 12px rgba(240,191,174,.7);transition:width .45s cubic-bezier(.2,.8,.2,1)}
 .pm-top{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-area-inset-top,0px)) 18px 8px;transition:opacity .4s;position:relative;z-index:4}
 .pm-top b{font-family:var(--display);font-size:16px;font-weight:600;margin-right:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .pm-ct{font-size:13px;font-weight:600;color:#C9A9A6;font-variant-numeric:tabular-nums;margin-right:6px}
 .pm-b{width:38px;height:38px;flex:none;border-radius:50%;border:1px solid rgba(240,191,174,.25);background:rgba(255,255,255,.04);color:#F3E3DD;display:grid;place-items:center;cursor:pointer;font:inherit;font-size:16px}
 .pm-b:hover,.pm-b[aria-pressed="true"]{background:rgba(240,191,174,.16)}.pm-b svg{width:18px;height:18px}
-.pm-stage{flex:1;position:relative;overflow:hidden;cursor:pointer;touch-action:pan-y}
+.pm-stage{flex:1;position:relative;overflow:hidden;cursor:pointer;touch-action:pan-y;perspective:1600px}
 .pm-card{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
-.pm-card canvas{border-radius:6px;box-shadow:0 30px 80px -20px rgba(0,0,0,.75),0 0 0 1px rgba(240,191,174,.08);background:#fff}
+.pm-card .pm-sl{position:relative;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .5s cubic-bezier(.2,.8,.2,1);transform-style:preserve-3d}
+.pm-card .pm-sl>canvas{display:block;border-radius:6px;box-shadow:0 40px 90px -24px rgba(0,0,0,.8),0 0 0 1px rgba(240,191,174,.1);background:#fff;position:relative}
+.pm-card .pm-sl>canvas.pm-glow{position:absolute;inset:0;width:100%!important;height:100%!important;filter:blur(70px) saturate(1.5);opacity:.55;transform:scale(1.12) translateZ(-1px);border-radius:40px;pointer-events:none}
+.pm-card .pm-sl::after{content:"";position:absolute;inset:0;border-radius:6px;pointer-events:none;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.16) 48%,transparent 60%);background-size:250% 100%;background-position:120% 0;opacity:0}
+.pm-intro{position:absolute;inset:0;z-index:6;display:grid;place-items:center;text-align:center;background:radial-gradient(120% 100% at 50% 0%,#2A1219 0%,#120A0D 70%);pointer-events:none}
+.pm-intro p{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:#C9A9A6;margin-bottom:14px}
+.pm-intro h2{font-family:var(--display);font-size:clamp(30px,5vw,58px);font-weight:600;color:#FFF4EF;line-height:1.1;max-width:80vw}
+.pm-intro i{display:block;width:64px;height:2px;background:#F0BFAE;margin:22px auto 0;box-shadow:0 0 14px #F0BFAE}
+.pm-laser{position:fixed;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:#FFB4A2;box-shadow:0 0 0 4px rgba(255,180,162,.35),0 0 24px 8px rgba(240,120,110,.6);pointer-events:none;z-index:7;transition:opacity .2s}
+.pm.laser,.pm.laser .pm-stage{cursor:none}
 .pm-nav{position:absolute;top:50%;width:52px;height:52px;margin-top:-6px;border-radius:50%;border:1px solid rgba(240,191,174,.25);background:rgba(18,10,13,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:#F3E3DD;display:grid;place-items:center;cursor:pointer;transition:opacity .4s,background .15s;z-index:3}
 .pm-nav:hover{background:rgba(240,191,174,.18)}.pm-nav svg{width:22px;height:22px}
 .pm-nav.prev{left:18px}.pm-nav.next{right:18px}.pm-nav:disabled{opacity:0!important;pointer-events:none}
@@ -369,10 +378,19 @@ a.btn{text-decoration:none}
 .pm-th.on canvas,.pm-th:hover canvas{outline-color:#F0BFAE}.pm-th.on{color:#F0BFAE}
 @media (max-width:640px){.pm-nav{width:42px;height:42px}.pm-nav.prev{left:8px}.pm-nav.next{right:8px}}
 @media (prefers-reduced-motion:no-preference){
-  .pm-card.in{animation:pmIn .55s cubic-bezier(.2,.8,.2,1) both}
-  .pm-card.out{animation:pmOut .4s ease both}
-  @keyframes pmIn{from{opacity:0;transform:translateX(calc(var(--dx,1) * 48px)) scale(.97)}}
-  @keyframes pmOut{to{opacity:0;transform:translateX(calc(var(--dx,1) * -48px)) scale(.97)}}
+  .pm-card.in{animation:pmIn .8s cubic-bezier(.16,.84,.24,1) both}
+  .pm-card.out{animation:pmOut .55s cubic-bezier(.5,0,.75,0) both}
+  .pm-card.first{animation:pmFirst 1.1s cubic-bezier(.16,.84,.24,1) .15s both}
+  .pm-card.in .pm-sl::after,.pm-card.first .pm-sl::after{animation:pmShine 1.3s ease .35s both}
+  .pm-card.in .pm-glow{animation:pmGlow 1.2s ease both}
+  @keyframes pmIn{from{opacity:0;transform:translateX(calc(var(--dx,1) * 90px)) rotateY(calc(var(--dx,1) * -14deg)) scale(.9);filter:blur(8px)}}
+  @keyframes pmOut{to{opacity:0;transform:translateX(calc(var(--dx,1) * -90px)) rotateY(calc(var(--dx,1) * 14deg)) scale(.9);filter:blur(8px)}}
+  @keyframes pmFirst{from{opacity:0;transform:translateY(40px) scale(.86) rotateX(10deg);filter:blur(10px)}}
+  @keyframes pmShine{0%{opacity:1;background-position:120% 0}100%{opacity:1;background-position:-30% 0}}
+  @keyframes pmGlow{from{opacity:0}}
+  .pm-intro{animation:pmIntro 1.9s ease both}.pm-intro>div{animation:pmIntroT 1.9s cubic-bezier(.16,.84,.24,1) both}
+  @keyframes pmIntro{0%,62%{opacity:1}100%{opacity:0}}
+  @keyframes pmIntroT{0%{opacity:0;transform:translateY(16px);letter-spacing:.02em}30%,60%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-10px) scale(.98)}}
 }
 .who-page{position:fixed;inset:0;z-index:90;background:radial-gradient(120% 90% at 85% 10%,#7A2639 0%,#4A1522 55%,#3A0F1A 100%);display:grid;place-items:center;padding:24px 16px}
 .who-in{width:100%;max-width:560px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
@@ -397,6 +415,7 @@ a.btn{text-decoration:none}
 .who-back{background:none;border:1px solid rgba(240,191,174,.35);color:#F3E3DD}
 .who-go{background:#F0BFAE;border:0;color:#5C1A2B}
 #fx{position:fixed;inset:0;pointer-events:none;z-index:50}
+.pm-on #fx{z-index:90}
 @media (prefers-reduced-motion:no-preference){
   .fade{animation:fadeUp .28s ease both}
   @keyframes fadeUp{from{opacity:.001;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -772,17 +791,19 @@ function vProveedores(){const f=S.pf;const uses={};S.eventos.forEach(e=>(e.prove
 /* ---------- MODO PRESENTACIÓN (PDF) ---------- */
 let _pm=null;
 function closePresent(){const p=_pm;if(!p)return;_pm=null;p.cancel=true;clearTimeout(p.t);document.removeEventListener('keydown',p.key,true);removeEventListener('resize',p.rs);
-  try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}p.el.remove()}
+  try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}p.el.remove();document.body.classList.remove('pm-on')}
 async function openPresent(pdf,name,start){
   closePresent();const n=pdf.numPages;const el=document.createElement('div');el.className='pm';el.setAttribute('role','dialog');el.setAttribute('aria-label','Presentación: '+name);
   const fsOk=!!(document.fullscreenEnabled&&el.requestFullscreen);
   el.innerHTML=`<div class="pm-prog"><i></i></div>
-    <div class="pm-top"><b>${esc(name)}</b><span class="pm-ct" aria-live="polite"></span><button class="pm-b" data-pm="grid" aria-label="Ver todas las diapositivas" aria-pressed="false">${ic('panel')}</button>${fsOk?'<button class="pm-b" data-pm="fs" aria-label="Pantalla completa">⛶</button>':''}<button class="pm-b" data-pm="x" aria-label="Salir de la presentación">${ic('x')}</button></div>
+    <div class="pm-top"><b>${esc(name)}</b><span class="pm-ct" aria-live="polite"></span><button class="pm-b" data-pm="laser" aria-label="Puntero láser (L)" aria-pressed="false">✦</button><button class="pm-b" data-pm="grid" aria-label="Ver todas las diapositivas" aria-pressed="false">${ic('panel')}</button>${fsOk?'<button class="pm-b" data-pm="fs" aria-label="Pantalla completa">⛶</button>':''}<button class="pm-b" data-pm="x" aria-label="Salir de la presentación">${ic('x')}</button></div>
     <div class="pm-stage"></div>
     <button class="pm-nav prev" data-pm="prev" aria-label="Anterior">${ic('left')}</button><button class="pm-nav next" data-pm="next" aria-label="Siguiente">${ic('right')}</button>
-    <div class="pm-hint">← → o toca los lados para avanzar · Esc para salir</div>
-    <div class="pm-grid" hidden></div>`;
-  document.getElementById('viewer-root').appendChild(el);
+    <div class="pm-hint">← → para avanzar · L puntero láser · G todas · Esc salir</div>
+    <div class="pm-grid" hidden></div><span class="pm-laser" hidden></span>
+    ${REDUCED?'':`<div class="pm-intro" aria-hidden="true"><div><p>El Broche Final</p><h2>${esc(name.replace(/\.pdf$/i,''))}</h2><i></i></div></div>`}`;
+  document.getElementById('viewer-root').appendChild(el);document.body.classList.add('pm-on');
+  const intro=el.querySelector('.pm-intro');if(intro)setTimeout(()=>intro.remove(),1950);
   const stage=el.querySelector('.pm-stage'),ct=el.querySelector('.pm-ct'),bar=el.querySelector('.pm-prog i'),grid=el.querySelector('.pm-grid'),hint=el.querySelector('.pm-hint');
   const P=_pm={el,cancel:false,i:0,cache:new Map(),busy:null};
   const dpr=Math.min(devicePixelRatio||1,2);
@@ -794,9 +815,13 @@ async function openPresent(pdf,name,start){
   async function show(i,dir){i=Math.max(1,Math.min(n,i));if(i===P.i&&dir!==0)return;const tok=P.tok=(P.tok||0)+1;P.i=i;
     ct.textContent=i+' / '+n;bar.style.width=(i/n*100)+'%';el.querySelector('.prev').disabled=i===1;el.querySelector('.next').disabled=i===n;
     let src;try{src=await bmp(i)}catch(e){return}if(P.cancel||tok!==P.tok)return;
-    const card=document.createElement('div');card.className='pm-card'+(dir?' in':'');card.style.setProperty('--dx',dir<0?-1:1);
-    const c=document.createElement('canvas');c.width=src.width;c.height=src.height;c.style.width=src._w+'px';c.style.height=src._h+'px';c.getContext('2d').drawImage(src,0,0);c.setAttribute('role','img');c.setAttribute('aria-label','Diapositiva '+i+' de '+n);card.appendChild(c);
-    stage.querySelectorAll('.pm-card:not(.out)').forEach(o=>{if(!dir){o.remove();return}o.classList.add('out');o.style.setProperty('--dx',dir<0?-1:1);setTimeout(()=>o.remove(),420)});
+    const card=document.createElement('div');card.className='pm-card'+(dir?' in':(P.first?'':' first'));P.first=true;card.style.setProperty('--dx',dir<0?-1:1);
+    const sl=document.createElement('div');sl.className='pm-sl';
+    const g=document.createElement('canvas');g.className='pm-glow';g.width=48;g.height=Math.max(1,Math.round(48*src.height/src.width));g.getContext('2d').drawImage(src,0,0,g.width,g.height);g.setAttribute('aria-hidden','true');
+    const c=document.createElement('canvas');c.width=src.width;c.height=src.height;c.style.width=src._w+'px';c.style.height=src._h+'px';c.getContext('2d').drawImage(src,0,0);c.setAttribute('role','img');c.setAttribute('aria-label','Diapositiva '+i+' de '+n);
+    sl.appendChild(g);sl.appendChild(c);card.appendChild(sl);
+    if(i===n&&dir>0&&!P.fin){P.fin=true;setTimeout(()=>{if(_pm===P)confetti()},500)}
+    stage.querySelectorAll('.pm-card:not(.out)').forEach(o=>{if(!dir){o.remove();return}o.classList.add('out');o.style.setProperty('--dx',dir<0?-1:1);setTimeout(()=>o.remove(),560)});
     stage.appendChild(card);
     [i+1,i-1,i+2].forEach(k=>{if(k>=1&&k<=n)bmp(k).catch(()=>{})});
     grid.querySelectorAll('.pm-th').forEach(t=>t.classList.toggle('on',+t.dataset.i===i))}
@@ -808,17 +833,23 @@ async function openPresent(pdf,name,start){
     grid.querySelector('.pm-th.on')?.scrollIntoView({block:'center'})}
   function fs(){try{document.fullscreenElement?document.exitFullscreen():el.requestFullscreen().catch(()=>{})}catch(e){}}
   el.addEventListener('click',e=>{const b=e.target.closest('[data-pm],.pm-th');if(b){e.stopPropagation();if(b.classList.contains('pm-th')){grid.hidden=true;el.querySelector('[data-pm="grid"]').setAttribute('aria-pressed','false');const t=+b.dataset.i;show(t,t<P.i?-1:1);return}
-      const a=b.dataset.pm;if(a==='x')closePresent();else if(a==='next')go(1);else if(a==='prev')go(-1);else if(a==='grid')openGrid();else if(a==='fs')fs();return}
+      const a=b.dataset.pm;if(a==='x')closePresent();else if(a==='next')go(1);else if(a==='prev')go(-1);else if(a==='grid')openGrid();else if(a==='fs')fs();else if(a==='laser')laser();return}
     if(e.target.closest('.pm-stage')&&!P.swiped){const r=stage.getBoundingClientRect();go(e.clientX-r.left>r.width*.35?1:-1)}P.swiped=false});
   let sx=null;stage.addEventListener('pointerdown',e=>{sx=e.clientX});stage.addEventListener('pointerup',e=>{if(sx!=null&&Math.abs(e.clientX-sx)>50){P.swiped=true;go(e.clientX<sx?1:-1)}sx=null});
   P.key=e=>{if(!_pm)return;const k=e.key;let used=true;
     if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].includes(k))go(1);else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(k))go(-1);
     else if(k==='Home')show(1,-1);else if(k==='End')show(n,1);else if(k==='Escape'){if(!grid.hidden){grid.hidden=true;el.querySelector('[data-pm="grid"]').setAttribute('aria-pressed','false')}else if(!document.fullscreenElement)closePresent()}
-    else if(k==='f'||k==='F')fs();else if(k==='g'||k==='G')openGrid();else used=false;
+    else if(k==='f'||k==='F')fs();else if(k==='l'||k==='L')laser();else if(k==='g'||k==='G')openGrid();else used=false;
     if(used){e.preventDefault();e.stopImmediatePropagation()}};
   document.addEventListener('keydown',P.key,true);
+  const dot=el.querySelector('.pm-laser');
+  function laser(){const on=el.classList.toggle('laser');dot.hidden=!on;el.querySelector('[data-pm="laser"]').setAttribute('aria-pressed',String(on))}
+  const fine=!REDUCED&&matchMedia('(pointer:fine)').matches;
+  el.addEventListener('pointermove',e=>{if(!dot.hidden){dot.style.left=e.clientX+'px';dot.style.top=e.clientY+'px'}
+    if(!fine)return;const s=stage.querySelector('.pm-card:not(.out) .pm-sl');if(!s)return;const r=stage.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;s.style.setProperty('--ry',(x*5).toFixed(2)+'deg');s.style.setProperty('--rx',(-y*4).toFixed(2)+'deg')});
+  stage.addEventListener('pointerleave',()=>{const s=stage.querySelector('.pm-card:not(.out) .pm-sl');if(s){s.style.setProperty('--ry','0deg');s.style.setProperty('--rx','0deg')}});
   const wake=()=>{el.classList.remove('idle');clearTimeout(P.t);P.t=setTimeout(()=>{if(grid.hidden)el.classList.add('idle')},2600)};el.addEventListener('pointermove',wake);wake();
-  setTimeout(()=>{hint.style.opacity=0},3500);
+  setTimeout(()=>{hint.style.opacity=0},4500);
   P.rs=()=>{clearTimeout(P.rt);P.rt=setTimeout(()=>{P.cache.clear();show(P.i,0)},150)};addEventListener('resize',P.rs);
   el.querySelector('[data-pm="next"]').focus();
   await show(start||1,0)}
