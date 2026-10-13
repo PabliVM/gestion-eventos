@@ -332,20 +332,12 @@ img{max-width:100%}
     <div class="side-foot">
       <button class="btn sm" id="export-all" hidden style="background:transparent;color:var(--side-ink);border-color:rgba(240,191,174,.3)">Exportar todo</button>
       <div class="who"><span class="av">L</span><span class="av">C</span><span>Laura y Cris</span></div>
-      <button class="btn sm" id="logout" style="background:transparent;color:var(--side-muted);border-color:rgba(240,191,174,.2)">Cerrar sesión</button>
     </div>
   </aside>
   <main id="main"><div class="empty">Cargando…</div></main>
 </div>
 
-<div id="login" class="login" hidden>
-  <div class="login-card">
-    <p class="login-mark">El Broche Final</p>
-    <p class="login-sub">Gestión de eventos</p>
-    <button class="btn primary" id="login-btn" style="justify-content:center;padding:10px 16px">Entrar con Google</button>
-    <p class="login-err" id="login-err" hidden></p>
-  </div>
-</div>
+
 <div id="modal-root"></div>
 <div id="toast" class="toast" hidden></div>
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -937,7 +929,7 @@ window.startApp=function(db){
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, doc, onSnapshot, setDoc, updateDoc, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 // ── CONFIGURACIÓN DE FIREBASE ── pega aquí la de tu proyecto (Firebase Console → Configuración → App web)
 const firebaseConfig = {
   apiKey: "AIzaSyBTEKOmgtn1Z9_L0wS_2gL99xJASkvoN_0",
@@ -952,8 +944,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function permitido() {
-      return request.auth != null && request.auth.token.email_verified == true
-        && request.auth.token.email in ['correo.laura@gmail.com','correo.cris@gmail.com'];
+      return request.auth != null;
     }
     match /{document=**} { allow read, write: if permitido(); }
   }
@@ -981,17 +972,10 @@ async function importSeed() {
 }
 window._fb = { db, auth, importSeed };
 
-const login = document.getElementById("login");
-document.getElementById("login-btn").onclick = async () => {
-  const err = document.getElementById("login-err"); err.hidden = true;
-  try { await signInWithPopup(auth, new GoogleAuthProvider()); }
-  catch (e) { err.textContent = "No se ha podido iniciar sesión. Inténtalo de nuevo."; err.hidden = false; }
-};
-document.getElementById("logout").onclick = () => signOut(auth).then(() => location.reload());
 let started = false;
 onAuthStateChanged(auth, user => {
-  login.hidden = !!user;
-  if (user && !started) { started = true; window.startApp(db); }
+  if (!user) { signInAnonymously(auth).catch(e => { console.error(e); window.startApp(db); }); return; }
+  if (!started) { started = true; window.startApp(db); }
 });
 </script>
 </body>
