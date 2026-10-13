@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%235C1A2B%22/%3E%3Ctext x=%2216%22 y=%2222%22 font-size=%2216%22 text-anchor=%22middle%22 fill=%22%23F0BFAE%22 font-family=%22Georgia%22%3EBF%3C/text%3E%3C/svg%3E">
 <title>El Broche Final · Gestión</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=DM+Sans:opsz,wght@9..40,400..700&display=swap">
@@ -306,6 +307,17 @@ a.btn{text-decoration:none}
 .doc-opt span{display:flex;flex-direction:column;min-width:0}
 .doc-opt b{font-size:13px}.doc-opt small{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
 .doc-opt.up{border-style:dashed;color:var(--accent)}
+.vw{position:fixed;inset:0;z-index:70;background:#1A1013;display:flex;flex-direction:column}
+.vw-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;background:#4A1522;color:#F3E3DD}
+.vw-bar b{font-family:var(--display);font-size:17px;font-weight:600;margin-right:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60vw}
+.vw-st{font-size:12px;color:#C9A9A6}
+.vw-btn{background:transparent!important;color:#F3E3DD!important;border-color:rgba(240,191,174,.35)!important}
+.vw-body{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;align-items:center;gap:16px}
+.vw-page{position:relative;background:#fff;box-shadow:0 8px 28px -12px rgba(0,0,0,.6);max-width:100%}
+.vw-page canvas{display:block;max-width:100%;height:auto!important}
+.vw-page span{position:absolute;right:8px;bottom:6px;font-size:11px;font-weight:700;color:#fff;background:rgba(0,0,0,.4);border-radius:999px;padding:1px 7px}
+.vw-img{width:100%;max-width:1400px;height:auto;display:block}
+.vw-msg{color:#F3E3DD;text-align:center;margin-top:20vh;line-height:1.6}
 #fx{position:fixed;inset:0;pointer-events:none;z-index:50}
 @media (prefers-reduced-motion:no-preference){
   .fade{animation:fadeUp .28s ease both}
@@ -316,11 +328,6 @@ a.btn{text-decoration:none}
 [hidden]{display:none!important}
 body{margin:0}
 img{max-width:100%}
-.login{position:fixed;inset:0;background:#4A1522;display:grid;place-items:center;z-index:100;padding:16px}
-.login-card{background:#FFFDFB;border-radius:16px;padding:36px 32px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:14px;text-align:center}
-.login-mark{font-family:'Fraunces',Georgia,serif;font-size:28px;font-weight:600;color:#5C1A2B}
-.login-sub{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#8A7A7C;margin-top:-8px}
-.login-err{color:#A12E2E;font-size:13px}
 </style>
 </head>
 <body>
@@ -336,9 +343,8 @@ img{max-width:100%}
   </aside>
   <main id="main"><div class="empty">Cargando…</div></main>
 </div>
-
-
 <div id="modal-root"></div>
+<div id="viewer-root"></div>
 <div id="toast" class="toast" hidden></div>
 <canvas id="fx" aria-hidden="true"></canvas>
 
@@ -432,7 +438,7 @@ document.getElementById('menu').addEventListener('click',e=>{const b=e.target.cl
 /* ===================== render ===================== */
 function render(){renderMenu();const m=document.getElementById('main');
   if(!S.ready){m.innerHTML='<div class="empty">Cargando vuestros datos…</div>';return}
-  let h=S.denied?'<div class="banner">Tu cuenta no tiene permiso para ver estos datos. Pide que añadan tu email en las reglas de Firestore.</div>':'';
+  let h=S.denied?'<div class="banner">Firebase no deja leer los datos. Revisad las reglas de Firestore y que Authentication (Anónimo) esté activado.</div>':'';
   if(S.needSeed&&!S.denied)h+=`<div class="banner" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><span>La base de datos está vacía. ¿Cargamos los eventos, el histórico y la colaboración con Groove?</span><button class="btn primary sm" data-act="seed">Importar datos iniciales</button></div>`;
   if(S.view==='evento'&&!curEv())S.view='eventos';
   if(S.view==='colab'&&!curCo())S.view='colaboraciones';
@@ -630,6 +636,47 @@ function vProveedores(){const f=S.pf;const uses={};S.eventos.forEach(e=>(e.prove
   <div class="card">${l.length?`<div class="tbl-wrap"><table><thead><tr><th>Proveedor</th><th>Categoría</th><th>Contacto</th><th>Precio orientativo</th><th>Valoración</th><th class="r">Eventos</th></tr></thead><tbody>${l.map(p=>`<tr class="link" data-prov="${esc(p.id)}"><td class="strong">${esc(p.nombre)}</td><td>${esc(CATS[p.categoria]||'—')}</td><td><div>${esc(p.contacto||'')}</div><div class="small muted">${esc([p.telefono,p.email].filter(Boolean).join(' · '))}</div></td><td>${esc(p.precio||'—')}</td><td><span class="stars" aria-label="${N(p.valoracion)} de 5">${'★'.repeat(N(p.valoracion))}<span style="color:var(--line-2)">${'★'.repeat(5-N(p.valoracion))}</span></span></td><td class="r num">${uses[p.nombre.toLowerCase()]||0}</td></tr>`).join('')}</tbody></table></div>`
     :`<div class="empty">${S.proveedores.length?'Ningún proveedor con estos filtros.':'Todavía no hay proveedores. Añadid los de confianza para asignarlos rápido a cada evento.'}<button class="btn primary" data-act="new-proveedor">${ic('plus')}Añadir proveedor</button></div>`}</div>`}
 
+/* ---------- VISOR DE DOCUMENTOS (PDF e imágenes) ---------- */
+const PDFJS='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
+let _pdfjsP=null;
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('script'));document.head.appendChild(s)})}
+function pdfjs(){if(window.pdfjsLib)return Promise.resolve(window.pdfjsLib);
+  if(!_pdfjsP)_pdfjsP=loadScript(PDFJS+'pdf.min.js').then(()=>loadScript(PDFJS+'pdf.worker.min.js')).then(()=>{window.pdfjsLib.GlobalWorkerOptions.workerSrc=PDFJS+'pdf.worker.min.js';return window.pdfjsLib}).catch(e=>{_pdfjsP=null;throw e});
+  return _pdfjsP}
+// Obtiene el archivo como Blob, venga de la propia app, de un asset o de Firestore
+async function getBlob(url){if(window._fb&&String(url).startsWith('fs:'))return window._fb.loadFile(String(url).slice(3));const r=await fetch(url);if(!r.ok)throw new Error('http '+r.status);return r.blob()}
+const isPdf=d=>/\.pdf$/i.test(d.archivo||d.nombre||'')||/pdf/i.test(d.tipo||'')||/\.pdf$/i.test(d.url||'');
+const isImg=d=>/\.(png|jpe?g|webp|gif|svg)$/i.test(d.archivo||d.nombre||'')||/^image\//.test(d.tipo||'');
+let _viewer=null;
+function closeViewer(){if(!_viewer)return;_viewer.cancel=true;if(_viewer.obj)URL.revokeObjectURL(_viewer.obj);document.getElementById('viewer-root').innerHTML='';document.removeEventListener('keydown',_viewer.key);document.body.style.overflow='';_viewer=null}
+async function openViewer(d){
+  closeViewer();const root=document.getElementById('viewer-root');
+  root.innerHTML=`<div class="vw" role="dialog" aria-label="${esc(d.nombre)}"><div class="vw-bar"><b>${esc(d.nombre)}</b><span class="vw-st" id="vw-st">Cargando…</span>
+    <div class="actions"><button class="btn sm vw-btn" id="vw-zo" aria-label="Reducir">−</button><button class="btn sm vw-btn" id="vw-zi" aria-label="Ampliar">+</button>${S.dl?`<button class="btn sm vw-btn" id="vw-dl">${ic('download')}Descargar</button>`:''}<button class="btn sm vw-btn" id="vw-x">${ic('x')}Cerrar</button></div></div>
+    <div class="vw-body" id="vw-body"></div></div>`;
+  document.body.style.overflow='hidden';
+  const v=_viewer={cancel:false,zoom:1,key:e=>{if(e.key==='Escape')closeViewer()}};document.addEventListener('keydown',v.key);
+  root.querySelector('#vw-x').onclick=closeViewer;
+  const st=root.querySelector('#vw-st'),body=root.querySelector('#vw-body');
+  let blob;try{blob=await getBlob(d.url)}catch(e){st.textContent='No se ha podido abrir el archivo';return}
+  if(v.cancel)return;
+  const dl=root.querySelector('#vw-dl');if(dl)dl.onclick=()=>S.dl.save({filename:d.archivo||d.nombre,data:blob}).then(()=>toast('Descargado'),e=>{if(!(e&&e.code==='declined'))toast('No se ha podido descargar')});
+  if(isImg(d)&&!isPdf(d)){v.obj=URL.createObjectURL(blob);body.innerHTML=`<img class="vw-img" src="${v.obj}" alt="${esc(d.nombre)}">`;st.textContent='';
+    const z=k=>{v.zoom=Math.min(3,Math.max(.4,v.zoom*k));body.querySelector('img').style.width=(v.zoom*100)+'%'};root.querySelector('#vw-zi').onclick=()=>z(1.25);root.querySelector('#vw-zo').onclick=()=>z(.8);return}
+  if(!isPdf(d)){st.textContent='';body.innerHTML=`<div class="vw-msg">Este tipo de archivo no se puede ver aquí. ${S.dl?'Descargadlo para abrirlo.':''}<br><small>Para verlo en pantalla, subid las presentaciones exportadas a PDF.</small></div>`;return}
+  let lib;try{lib=await pdfjs()}catch(e){st.textContent='No se ha podido cargar el visor de PDF';return}
+  let pdf;try{pdf=await lib.getDocument({data:new Uint8Array(await blob.arrayBuffer())}).promise}catch(e){st.textContent='El PDF no se puede leer';return}
+  if(v.cancel)return;
+  const n=pdf.numPages;st.textContent=n+(n===1?' página':' páginas');
+  body.innerHTML=Array.from({length:n},(_,i)=>`<div class="vw-page" data-p="${i+1}"><canvas></canvas><span>${i+1}</span></div>`).join('');
+  const render=async()=>{const w=Math.min(body.clientWidth-32,1400)*v.zoom;const dpr=Math.min(window.devicePixelRatio||1,2);
+    for(let i=1;i<=n;i++){if(v.cancel)return;const page=await pdf.getPage(i);const vp0=page.getViewport({scale:1});const scale=w/vp0.width;const vp=page.getViewport({scale:scale*dpr});
+      const box=body.querySelector(`.vw-page[data-p="${i}"]`);if(!box)return;const c=box.querySelector('canvas');c.width=vp.width;c.height=vp.height;c.style.width=(vp.width/dpr)+'px';c.style.height=(vp.height/dpr)+'px';
+      await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise}};
+  render();
+  const z=k=>{v.zoom=Math.min(3,Math.max(.4,v.zoom*k));render()};root.querySelector('#vw-zi').onclick=()=>z(1.25);root.querySelector('#vw-zo').onclick=()=>z(.8);
+}
+
 /* ---------- COLABORACIONES ---------- */
 const TIPOS_CO={espacio:'Espacio',marca:'Marca',agencia:'Agencia',empresa:'Empresa',proveedor:'Proveedor',otro:'Otro'};
 const ESTADOS_CO={idea:'Idea',conversacion:'En conversación',propuesta:'Propuesta enviada',negociacion:'En negociación',cerrada:'Cerrada',descartada:'Descartada'};
@@ -660,15 +707,16 @@ function vColab(){const c=curCo();const docs=c.documentos||[];const pres=docs.fi
     <div class="card"><div class="card-h"><h3>Notas</h3><span class="sub">Se guarda al salir del campo</span></div><div class="card-b"><textarea class="inp" id="co-notas" data-conotas style="min-height:170px" placeholder="Lo hablado, próximos pasos, condiciones…">${esc(c.notas)}</textarea></div></div>
   </div>
   <div class="card"><div class="card-h"><h3>Documentos</h3>${S.assets?`<label class="btn sm" for="co-file">${ic('plus')}Subir documento</label><input type="file" id="co-file" accept="application/pdf,image/*,.docx,.pptx,.xlsx" hidden>`:''}</div>
+    <p class="small muted" style="padding:10px 18px 0">Para verlas en pantalla, subid las presentaciones exportadas a PDF.</p>
     ${docs.length?`<div class="rows">${docs.map(d=>`<div class="rw"><span class="alert-ic">${ic('list')}</span><div class="grow"><p class="t">${esc(d.nombre)}</p><p class="s">${esc(d.desc||(d.slides?d.slides+' diapositivas':'Documento'))}</p></div>
-      <div class="actions">${d.slides?`<button class="btn sm" data-act="slides-open">Ver</button>`:`<a class="btn sm" href="${esc(d.url)}" target="_blank" rel="noopener">Abrir</a>`}${S.dl?`<button class="btn sm" data-act="doc-dl" data-url="${esc(d.url)}" data-name="${esc(d.archivo||d.nombre)}">${ic('download')}Descargar</button>`:''}<button class="btn ghost icon" data-act="doc-del" data-doc="${esc(d.id)}" aria-label="Quitar documento">${ic('x')}</button></div></div>`).join('')}</div>`
+      <div class="actions">${d.slides?`<button class="btn sm" data-act="slides-open">Diapositivas</button>`:''}${isPdf(d)||isImg(d)?`<button class="btn sm primary" data-act="doc-view" data-doc="${esc(d.id)}">Ver</button>`:''}${S.dl?`<button class="btn sm" data-act="doc-dl" data-url="${esc(d.url)}" data-name="${esc(d.archivo||d.nombre)}">${ic('download')}Descargar</button>`:''}<button class="btn ghost icon" data-act="doc-del" data-doc="${esc(d.id)}" aria-label="Quitar documento">${ic('x')}</button></div></div>`).join('')}</div>`
       :`<div class="empty small">Sin documentos. ${S.assets?'Subid la propuesta, el dossier o el contrato.':''}</div>`}</div>
   ${pres&&S.slideOpen?slideViewer(pres):''}`}
 function slideViewer(d){const n=d.slides,i=Math.min(Math.max(S.slideIdx||1,1),n);
   return `<div class="card" id="viewer"><div class="card-h"><h3>${esc(d.nombre)}</h3><div class="actions"><span class="small muted num">${i} / ${n}</span><button class="btn icon" data-act="sl-prev" aria-label="Anterior" ${i<=1?'disabled':''}>${ic('left')}</button><button class="btn icon" data-act="sl-next" aria-label="Siguiente" ${i>=n?'disabled':''}>${ic('right')}</button><button class="btn ghost sm" data-act="slides-close">Cerrar</button></div></div>
   <div class="card-b"><img class="sl-big" src="${esc(d.base)}${i}.jpg" alt="Diapositiva ${i}">
   <div class="sl-strip">${Array.from({length:n},(_,k)=>`<button class="sl-th${k+1===i?' on':''}" data-act="sl-go" data-i="${k+1}" aria-label="Diapositiva ${k+1}"><img src="${esc(d.base)}${k+1}.jpg" alt="" loading="lazy"></button>`).join('')}</div></div></div>`}
-async function dlFile(url,name){if(!S.dl)return;try{const r=await fetch(url);if(!r.ok)throw 0;const b=await r.blob();await S.dl.save({filename:name,data:b});toast('Descargado')}catch(e){if(!(e&&e.code==='declined'))toast('No se ha podido descargar')}}
+async function dlFile(url,name){if(!S.dl)return;try{const b=await getBlob(url);await S.dl.save({filename:name,data:b});toast('Descargado')}catch(e){if(!(e&&e.code==='declined'))toast('No se ha podido descargar')}}
 async function patchCo(c,patch,msg,quiet){Object.assign(c,patch);if(!quiet)render();return guard(()=>S.db.doc('colaboraciones/'+c.id).update({...patch,actualizado:new Date().toISOString()}),msg)}
 function openColab(c){const x=c||{tipo:'espacio',estado:'conversacion',documentos:[]};
   const root=modal(c?'Editar colaboración':'Nueva colaboración',`
@@ -688,7 +736,7 @@ function openColab(c){const x=c||{tipo:'espacio',estado:'conversacion',documento
    save:async d=>{const body={nombre:d.nombre.trim(),tipo:d.tipo,estado:d.estado,contacto:d.contacto.trim(),proximaReunion:d.proximaReunion||null,telefono:d.telefono.trim(),email:d.email.trim(),propuesta:d.propuesta.trim(),dedicacion:d.dedicacion.trim(),actualizado:new Date().toISOString()};
      const libIds=new Set(LIB_DOCS.map(L=>L.id));let docs=((c&&c.documentos)||[]).filter(x=>!libIds.has(x.id));
      LIB_DOCS.forEach(L=>{if(d['lib_'+L.id])docs.unshift({...L})});
-     const up=document.getElementById('co-up');if(up&&up.files&&up.files.length&&S.assets){toast('Subiendo archivos…');for(const f of up.files){try{const r=await S.assets.upload(f);docs.push({id:rid(),nombre:f.name,archivo:f.name,url:r.url,assetId:r.id,desc:Math.round(f.size/1024)+' KB'})}catch(e){toast('No se ha podido subir '+f.name)}}}
+     const up=document.getElementById('co-up');if(up&&up.files&&up.files.length&&S.assets){toast('Subiendo archivos…');for(const f of up.files){try{const r=await S.assets.upload(f);docs.push({id:rid(),nombre:f.name,archivo:f.name,tipo:f.type,url:r.url,assetId:r.id,desc:Math.round(f.size/1024)+' KB'})}catch(e){toast('No se ha podido subir '+f.name)}}}
      body.documentos=docs;
      if(c){const ok=await guard(()=>S.db.doc('colaboraciones/'+c.id).update(body),'Colaboración actualizada');if(ok&&body.estado==='cerrada'&&c.estado!=='cerrada')confetti();return ok}
      const ref=S.db?.collection('colaboraciones').doc();const ok=await guard(()=>ref.set({...body,notas:(d.notas||'').trim()}),'Colaboración añadida');
@@ -752,6 +800,7 @@ main.addEventListener('click',async ev=>{const t=ev.target.closest('button,[data
   else if(a==='slides-close'){S.slideOpen=false;render()}
   else if(a==='sl-prev'||a==='sl-next'||a==='sl-go'){S.slideIdx=a==='sl-go'?+d.i:S.slideIdx+(a==='sl-next'?1:-1);render();document.getElementById('viewer')?.scrollIntoView({block:'nearest'})}
   else if(a==='doc-dl')dlFile(d.url,d.name);
+  else if(a==='doc-view'){const doc=(curCo().documentos||[]).find(x=>x.id===d.doc);if(doc)openViewer(doc)}
   else if(a==='doc-del'){if(!t.dataset.armed){t.dataset.armed=1;t.innerHTML='¿Quitar?';t.classList.add('danger');setTimeout(()=>{if(t.isConnected){delete t.dataset.armed;t.innerHTML=ic('x');t.classList.remove('danger')}},3000);return}
     const c=curCo();const doc=(c.documentos||[]).find(x=>x.id===d.doc);if(doc&&doc.assetId&&S.assets){try{await S.assets.delete(doc.assetId)}catch(e){}}await patchCo(c,{documentos:(c.documentos||[]).filter(x=>x.id!==d.doc)},'Documento quitado')}
   else if(a==='edit-evento')openEvento(curEv());
@@ -781,7 +830,7 @@ main.addEventListener('change',async ev=>{const t=ev.target,d=t.dataset;
   if(d.pay){const e=curEv();await patchEv(e,{pagos:(e.pagos||[]).map(p=>p.id===d.pay?{...p,pagado:t.checked,fechaCobro:t.checked?TODAY:null}:p)},t.checked?'Cobro registrado':'');return}
   if(d.cli!==undefined){const e=curEv();await patchEv(e,{cliente:{...(e.cliente||{}),[d.cli]:t.value.trim()}},'Guardado',true);return}
   if(d.conotas!==undefined){const c=curCo();if((c.notas||'')!==t.value)await patchCo(c,{notas:t.value},'Notas guardadas',true);return}
-  if(t.id==='co-file'&&t.files&&t.files[0]){const f=t.files[0];const c=curCo();toast('Subiendo…');try{const r=await S.assets.upload(f);await patchCo(c,{documentos:[...(c.documentos||[]),{id:rid(),nombre:f.name,archivo:f.name,url:r.url,assetId:r.id,desc:Math.round(f.size/1024)+' KB'}]},'Documento subido')}catch(e){toast('No se ha podido subir el archivo')}return}
+  if(t.id==='co-file'&&t.files&&t.files[0]){const f=t.files[0];const c=curCo();toast('Subiendo…');try{const r=await S.assets.upload(f);await patchCo(c,{documentos:[...(c.documentos||[]),{id:rid(),nombre:f.name,archivo:f.name,tipo:f.type,url:r.url,assetId:r.id,desc:Math.round(f.size/1024)+' KB'}]},'Documento subido')}catch(e){toast('No se ha podido subir el archivo')}return}
   if(d.notas!==undefined){const e=curEv();if((e.notas||'')!==t.value)await patchEv(e,{notas:t.value},'Notas guardadas',true);return}
   if(d.hist){const [y,k]=d.hist.split('|');saveNeg({historico:hist().map(r=>r.anio===+y?{...r,[k]:N(t.value)}:r)});return}
   if(d.neg){let v=N(t.value);if(d.pct)v/=100;saveNeg({[d.neg]:v});return}
@@ -911,12 +960,12 @@ function openProveedor(p){const x=p||{categoria:'catering',valoracion:0};
   root.querySelectorAll('#p-stars button').forEach(b=>b.onclick=()=>{const v=+b.dataset.v;root.querySelector('#p-v').value=v;root.querySelectorAll('#p-stars button').forEach(z=>z.classList.toggle('on',+z.dataset.v<=v))})}
 
 /* ===================== datos (Firebase) ===================== */
-// Descargas: en la web normal se descargan directamente con el navegador.
+// Descargas directas con el navegador
 S.dl={save:async({filename,data})=>{const b=data instanceof Blob?data:new Blob([data],{type:'text/csv;charset=utf-8'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1500);return {status:'saved'}}};
-S.sample=null;S.assets=null;S.needSeed=false;
+S.sample=null;S.needSeed=false;
 render();
 window.startApp=function(db){
-  S.db=db;
+  S.db=db;S.assets=window._fb&&window._fb.files||null;
   const seen={};const done=k=>{if(seen[k])return false;seen[k]=1;if(Object.keys(seen).length>=5){S.ready=true;S.anim=true;S.needSeed=!S.eventos.length&&!S.colaboraciones.length&&!S.negocio;render()}return true};
   const refresh=()=>{if(!S.ready)return;const a=document.activeElement;if(a&&a.closest&&a.closest('#main')&&/INPUT|SELECT|TEXTAREA/.test(a.tagName))return;if(document.getElementById('modal-root').innerHTML)return renderMenu();render()};
   const fail=e=>{console.error(e);S.ready=true;S.denied=e&&e.code==='permission-denied';render()};
@@ -928,9 +977,10 @@ window.startApp=function(db){
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, doc, onSnapshot, setDoc, updateDoc, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, onSnapshot, setDoc, updateDoc, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-// ── CONFIGURACIÓN DE FIREBASE ── pega aquí la de tu proyecto (Firebase Console → Configuración → App web)
+
+// ── CONFIGURACIÓN DE FIREBASE ──
 const firebaseConfig = {
   apiKey: "AIzaSyBTEKOmgtn1Z9_L0wS_2gL99xJASkvoN_0",
   authDomain: "gestion-eventos-f5e50.firebaseapp.com",
@@ -939,14 +989,11 @@ const firebaseConfig = {
   messagingSenderId: "795610543408",
   appId: "1:795610543408:web:a382677af4bc288e9904f5"
 };
-/* Reglas de Firestore (Firestore → Reglas). Solo entran estos correos:
+/* Reglas de Firestore (Firestore → Reglas):
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function permitido() {
-      return request.auth != null;
-    }
-    match /{document=**} { allow read, write: if permitido(); }
+    match /{document=**} { allow read, write: if request.auth != null; }   // si true mientras Authentication no esté activado
   }
 }
 */
@@ -964,17 +1011,42 @@ const col = name => { const c = collection(fs, name); return {
   doc: id => ref(id ? doc(c, id) : doc(c)) }; };
 const db = { collection: col, doc: p => ref(doc(fs, p)) };
 
+// Archivos en Firestore (sin Firebase Storage): troceados en documentos de ~700 KB
+const MAX_MB = 15, PARTE = 700000;
+const b64 = async blob => { const buf = new Uint8Array(await blob.arrayBuffer()); let s = ""; for (let i = 0; i < buf.length; i += 0x8000) s += String.fromCharCode.apply(null, buf.subarray(i, i + 0x8000)); return btoa(s); };
+const files = {
+  async upload(file) {
+    if (file.size > MAX_MB * 1024 * 1024) throw new Error("El archivo supera " + MAX_MB + " MB");
+    const id = doc(collection(fs, "archivos")).id, data = await b64(file), n = Math.ceil(data.length / PARTE);
+    for (let i = 0; i < n; i++) await setDoc(doc(fs, "archivos", id, "partes", String(i)), { d: data.slice(i * PARTE, (i + 1) * PARTE) });
+    await setDoc(doc(fs, "archivos", id), { nombre: file.name, tipo: file.type || "application/octet-stream", size: file.size, partes: n, creado: new Date().toISOString() });
+    return { id, url: "fs:" + id };
+  },
+  async delete(id) {
+    const m = await getDoc(doc(fs, "archivos", id)); if (!m.exists()) return;
+    for (let i = 0; i < (m.data().partes || 0); i++) await deleteDoc(doc(fs, "archivos", id, "partes", String(i)));
+    await deleteDoc(doc(fs, "archivos", id));
+  }
+};
+async function loadFile(id) {
+  const m = await getDoc(doc(fs, "archivos", id)); if (!m.exists()) throw new Error("no existe");
+  const { partes, tipo } = m.data(); let s = "";
+  for (let i = 0; i < partes; i++) s += (await getDoc(doc(fs, "archivos", id, "partes", String(i)))).data().d;
+  const bin = atob(s), out = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return new Blob([out], { type: tipo });
+}
+
+const SEED = {"eventos": {"ev-20261107-beatriz-alvaro": {"estado": "cerrado", "fecha": "2026-11-07", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Beatriz y Álvaro", "notas": "", "origen": "broche", "tipo": "boda"}, "ev-20270731-paola": {"estado": "cerrado", "fecha": "2027-07-31", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Paola", "notas": "", "origen": "broche", "tipo": "boda"}, "ev-20270529-isabella-alejandro": {"estado": "cerrado", "fecha": "2027-05-29", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Isabella y Alejandro", "notas": "", "origen": "broche", "tipo": "boda"}, "ev-20261018-elements": {"estado": "cerrado", "fecha": "2026-10-18", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Elements", "notas": "", "origen": "broche", "tipo": "empresa"}, "ev-20270403-elena-alex": {"estado": "cerrado", "fecha": "2027-04-03", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Elena y Alex", "notas": "", "origen": "broche", "tipo": "boda"}, "ev-20271218-paola-juan": {"estado": "cerrado", "fecha": "2027-12-18", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Nicole y Juan", "notas": "", "origen": "broche", "tipo": "boda"}, "ev-20261127-gabriela-juancarlos": {"estado": "cerrado", "fecha": "2026-11-27", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Gabriela y Juan Carlos", "notas": "", "origen": "broche", "tipo": "boda"}, "ev-20270321-natalia-carlos": {"estado": "cerrado", "fecha": "2027-03-21", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Natalia y Carlos", "notas": "", "origen": "broche", "tipo": "boda"}, "ev-20261212-sonia-pau": {"estado": "cerrado", "fecha": "2026-12-12", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Sonia y Pau", "notas": "", "origen": "broche", "tipo": "boda"}, "ev-20261205-noelia-alvaro": {"estado": "cerrado", "fecha": "2026-12-05", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Noelia y Álvaro", "notas": "", "origen": "broche", "tipo": "boda"}}, "colaboraciones": {"groove": {"actualizado": "2026-10-13T09:30:00Z", "contacto": "", "dedicacion": "80–90 % Groove · 10–20 % El Broche Final", "documentos": [{"archivo": "Presentacion_ElBrocheFinal_Groove.pdf", "base": "docs/slides/s", "desc": "PDF · 20 diapositivas", "id": "pres", "nombre": "Presentación El Broche Final × Groove", "slides": 20, "url": "docs/presentacion-groove.pdf"}, {"archivo": "Guia_presentacion_ElBrocheFinal_Groove.pdf", "desc": "PDF · 11 páginas · documento interno", "id": "guia", "nombre": "Guía de la presentación", "url": "docs/guia-presentacion.pdf"}], "email": "", "estado": "negociacion", "nombre": "Groove", "notas": "Departamento de eventos de Groove: nueva línea de negocio de día. Arranque en dos líneas (construcción comercial + activación). Piloto Social Club mensual entre el día 30 y el 45, con ediciones familiares puntuales (Social Club · Family Edition).", "propuesta": "50.000 € brutos anuales por persona + variable sobre negocio generado", "proximaReunion": "2026-10-14", "telefono": "", "tipo": "espacio"}}, "ajustes": {"negocio": {"bonus": 4000, "crecimiento": 0.5, "fijo": 50000, "historico": [{"anio": 2025, "bodas": 10, "eventos": 5, "facturacion": 26765, "meses": 12}, {"anio": 2026, "bodas": 25, "eventos": 17, "facturacion": 43461.63, "meses": 9}], "personas": 2}}};
 async function importSeed() {
-  const seed = {"eventos": {"ev-20261107-beatriz-alvaro": {"estado": "cerrado", "fecha": "2026-11-07", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Beatriz y Álvaro", "notas": "", "origen": "broche", "tipo": "boda"}, "ev-20270731-paola": {"estado": "cerrado", "fecha": "2027-07-31", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Paola", "notas": "", "origen": "broche", "tipo": "boda"}, "ev-20270529-isabella-alejandro": {"estado": "cerrado", "fecha": "2027-05-29", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Isabella y Alejandro", "notas": "", "origen": "broche", "tipo": "boda"}, "ev-20261018-elements": {"estado": "cerrado", "fecha": "2026-10-18", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Elements", "notas": "", "origen": "broche", "tipo": "empresa"}, "ev-20270403-elena-alex": {"estado": "cerrado", "fecha": "2027-04-03", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Elena y Alex", "notas": "", "origen": "broche", "tipo": "boda"}, "ev-20271218-paola-juan": {"estado": "cerrado", "fecha": "2027-12-18", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Nicole y Juan", "notas": "", "origen": "broche", "tipo": "boda"}, "ev-20261127-gabriela-juancarlos": {"estado": "cerrado", "fecha": "2026-11-27", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Gabriela y Juan Carlos", "notas": "", "origen": "broche", "tipo": "boda"}, "ev-20270321-natalia-carlos": {"estado": "cerrado", "fecha": "2027-03-21", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Natalia y Carlos", "notas": "", "origen": "broche", "tipo": "boda"}, "ev-20261212-sonia-pau": {"estado": "cerrado", "fecha": "2026-12-12", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Sonia y Pau", "notas": "", "origen": "broche", "tipo": "boda"}, "ev-20261205-noelia-alvaro": {"estado": "cerrado", "fecha": "2026-12-05", "importe": null, "invitados": null, "lugar": "otro", "nombre": "Noelia y Álvaro", "notas": "", "origen": "broche", "tipo": "boda"}}, "colaboraciones": {"groove": {"actualizado": "2026-10-13T09:30:00Z", "contacto": "", "dedicacion": "80–90 % Groove · 10–20 % El Broche Final", "documentos": [{"archivo": "Presentacion_ElBrocheFinal_Groove.pdf", "base": "docs/slides/s", "desc": "PDF · 20 diapositivas", "id": "pres", "nombre": "Presentación El Broche Final × Groove", "slides": 20, "url": "docs/presentacion-groove.pdf"}, {"archivo": "Guia_presentacion_ElBrocheFinal_Groove.pdf", "desc": "PDF · 11 páginas · documento interno", "id": "guia", "nombre": "Guía de la presentación", "url": "docs/guia-presentacion.pdf"}], "email": "", "estado": "negociacion", "nombre": "Groove", "notas": "Departamento de eventos de Groove: nueva línea de negocio de día. Arranque en dos líneas (construcción comercial + activación). Piloto Social Club mensual entre el día 30 y el 45, con ediciones familiares puntuales (Social Club · Family Edition).", "propuesta": "50.000 € brutos anuales por persona + variable sobre negocio generado", "proximaReunion": "2026-10-14", "telefono": "", "tipo": "espacio"}}, "ajustes": {"negocio": {"bonus": 4000, "crecimiento": 0.5, "fijo": 50000, "historico": [{"anio": 2025, "bodas": 10, "eventos": 5, "facturacion": 26765, "meses": 12}, {"anio": 2026, "bodas": 25, "eventos": 17, "facturacion": 43461.63, "meses": 9}], "personas": 2}}};
   const b = writeBatch(fs);
-  for (const [name, docs] of Object.entries(seed)) for (const [id, data] of Object.entries(docs)) b.set(doc(fs, name, id), data);
+  for (const [name, docs] of Object.entries(SEED)) for (const [id, data] of Object.entries(docs)) b.set(doc(fs, name, id), data);
   await b.commit();
 }
-window._fb = { db, auth, importSeed };
+window._fb = { db, auth, files, loadFile, importSeed };
 
 let started = false;
 onAuthStateChanged(auth, user => {
-  if (!user) { signInAnonymously(auth).catch(e => { console.error(e); window.startApp(db); }); return; }
+  if (!user) { signInAnonymously(auth).catch(e => { console.error(e); if (!started) { started = true; window.startApp(db); } }); return; }
   if (!started) { started = true; window.startApp(db); }
 });
 </script>
