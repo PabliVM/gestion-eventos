@@ -331,6 +331,15 @@ a.btn{text-decoration:none}
 @media (prefers-reduced-motion:no-preference){.who-opt{transition:background .15s,border-color .15s,transform .15s}.who-opt:hover{transform:translateY(-2px)}}
 .me-change{margin-left:auto;border:0;background:none;color:var(--side-muted);font:inherit;font-size:12px;text-decoration:underline;cursor:pointer;padding:0}
 .me-change:hover{color:var(--side-ink)}
+.who-pw{width:100%;max-width:340px;display:flex;flex-direction:column;gap:10px;text-align:left}
+.who-pw label{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#C9A9A6}
+.who-pw input{font:inherit;font-size:18px;padding:14px 16px;border-radius:12px;border:1px solid rgba(240,191,174,.35);background:rgba(255,244,239,.08);color:#FFF4EF;outline:none}
+.who-pw input:focus{border-color:#F0BFAE;background:rgba(255,244,239,.12)}
+.who-err{min-height:18px;font-size:13px;color:#F0BFAE}
+.who-act{display:flex;gap:10px}
+.who-act button{flex:1;font:inherit;font-weight:600;padding:13px;border-radius:12px;cursor:pointer}
+.who-back{background:none;border:1px solid rgba(240,191,174,.35);color:#F3E3DD}
+.who-go{background:#F0BFAE;border:0;color:#5C1A2B}
 #fx{position:fixed;inset:0;pointer-events:none;z-index:50}
 @media (prefers-reduced-motion:no-preference){
   .fade{animation:fadeUp .28s ease both}
@@ -365,6 +374,12 @@ img{max-width:100%}
       <button class="who-opt" data-who="Laura"><span class="who-av">L</span><b>Laura</b></button>
       <button class="who-opt" data-who="Cris"><span class="who-av">C</span><b>Cris</b></button>
     </div>
+    <form class="who-pw" id="who-pw" hidden autocomplete="off">
+      <label for="who-pass" id="who-lbl">Contraseña</label>
+      <input type="password" id="who-pass" autocomplete="current-password">
+      <p class="who-err" id="who-err" role="alert"></p>
+      <div class="who-act"><button type="button" class="who-back" id="who-back">Volver</button><button type="submit" class="who-go">Entrar</button></div>
+    </form>
   </div>
 </div>
 <div id="modal-root"></div>
@@ -450,11 +465,20 @@ const neg=()=>Object.assign({crecimiento:.5,fijo:45000,personas:2,bonus:4000},S.
 const curEv=()=>S.eventos.find(e=>e.id===S.evId);
 
 /* ===================== usuaria ===================== */
-S.me=(()=>{try{return localStorage.getItem('ebf-me')}catch(e){return null}})();
-function showWho(){const w=document.getElementById('who');w.hidden=false;document.body.style.overflow='hidden';w.querySelector('.who-opt')?.focus()}
-function setMe(n){S.me=n;try{localStorage.setItem('ebf-me',n)}catch(e){}document.getElementById('who').hidden=true;document.body.style.overflow='';paintMe();S.anim=true;render();toast('Hola, '+n)}
+S.me=(()=>{try{return localStorage.getItem('ebf-me2')}catch(e){return null}})();
+const WHO_PW={Laura:'302e885955230e5f0a1be4dfa5ecea2794c850048e8733206d05260354cd6f0a',Cris:'affa898b2e46b3514d44a4a21c24012c06f668e05eb10952be3ec01401966aff'};
+let _whoSel=null;
+async function sha256(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+function whoStep(n){_whoSel=n;const w=document.getElementById('who'),f=document.getElementById('who-pw');w.querySelector('.who-opts').hidden=!!n;f.hidden=!n;document.getElementById('who-err').textContent='';const p=document.getElementById('who-pass');p.value='';
+  w.querySelector('.who-q').textContent=n?'Hola, '+n:'¿Quién eres?';if(n)p.focus();else w.querySelector('.who-opt')?.focus()}
+function showWho(){const w=document.getElementById('who');w.hidden=false;document.body.style.overflow='hidden';whoStep(null)}
+function setMe(n){S.me=n;try{localStorage.setItem('ebf-me2',n)}catch(e){}document.getElementById('who').hidden=true;document.body.style.overflow='';paintMe();S.anim=true;render();toast('Hola, '+n)}
 function paintMe(){const a=document.getElementById('me-av'),t=document.getElementById('me-name');if(a)a.textContent=(S.me||'L').charAt(0);if(t)t.textContent=S.me||'Laura y Cris'}
-document.getElementById('who').addEventListener('click',e=>{const b=e.target.closest('[data-who]');if(b)setMe(b.dataset.who)});
+document.getElementById('who').addEventListener('click',e=>{const b=e.target.closest('[data-who]');if(b)whoStep(b.dataset.who)});
+document.getElementById('who-back').onclick=()=>whoStep(null);
+document.getElementById('who-pw').addEventListener('submit',async e=>{e.preventDefault();const p=document.getElementById('who-pass');
+  if(_whoSel&&await sha256(p.value.trim().toUpperCase())===WHO_PW[_whoSel])return setMe(_whoSel);
+  document.getElementById('who-err').textContent='Contraseña incorrecta';p.select()});
 document.getElementById('me-change').onclick=showWho;
 paintMe();if(!S.me)showWho();
 
