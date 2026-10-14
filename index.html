@@ -553,7 +553,7 @@ async function sha256(t){const b=await crypto.subtle.digest('SHA-256',new TextEn
 function whoStep(n){_whoSel=n;const w=document.getElementById('who'),f=document.getElementById('who-pw');w.querySelector('.who-opts').hidden=!!n;f.hidden=!n;document.getElementById('who-err').textContent='';const p=document.getElementById('who-pass');p.value='';
   w.querySelector('.who-q').textContent=n?'Hola, '+n:'¿Quién eres?';if(n)p.focus();else w.querySelector('.who-opt')?.focus()}
 function showWho(){const w=document.getElementById('who');w.hidden=false;document.body.style.overflow='hidden';whoStep(null)}
-function setMe(n){S.me=n;document.getElementById('who').hidden=true;document.body.style.overflow='';paintMe();S.anim=true;render();toast('Hola, '+n)}
+function setMe(n){S.me=n;S.view='panel';try{history.replaceState(null,'','#panel')}catch(e){}document.getElementById('who').hidden=true;document.body.style.overflow='';paintMe();S.anim=true;render();toast('Hola, '+n)}
 function paintMe(){const a=document.getElementById('me-av'),t=document.getElementById('me-name');if(a)a.textContent=(S.me||'L').charAt(0);if(t)t.textContent=S.me||'Laura y Cris'}
 document.getElementById('who').addEventListener('click',e=>{const b=e.target.closest('[data-who]');if(b)whoStep(b.dataset.who)});
 document.getElementById('who-back').onclick=()=>whoStep(null);
@@ -568,10 +568,10 @@ const VIEWS=[['panel','Panel'],['agenda','Agenda'],['eventos','Eventos'],['conta
 function renderMenu(){const late=S.contactos.filter(c=>['nuevo','contactado','presupuesto'].includes(c.estado)&&c.siguiente&&c.siguiente<TODAY).length;
   const cur=S.view==='evento'?'eventos':S.view==='colab'?'colaboraciones':S.view;
   document.getElementById('menu').innerHTML=VIEWS.map(([k,l])=>`<button data-nav="${k}" ${cur===k?'aria-current="page"':''}>${ic(k)}<span>${l}</span>${k==='contactos'&&late?`<span class="count" title="Seguimientos atrasados">${late}</span>`:''}</button>`).join('')}
-function go(v,id){S.view=v;if(id!==undefined)S.evId=id;if(v==='evento'&&id)S.evTab='resumen';S.anim=true;try{if(v!=='evento'&&v!=='colab')localStorage.setItem('ebf2-view',v)}catch(e){}
+function go(v,id){S.view=v;if(id!==undefined)S.evId=id;if(v==='evento'&&id)S.evTab='resumen';S.anim=true;
   try{history.replaceState(null,'',v==='evento'&&S.evId?'#ev~'+S.evId:v==='colab'&&S.coId?'#co~'+S.coId:'#'+v)}catch(e){}render();window.scrollTo(0,0)}
 document.getElementById('menu').addEventListener('click',e=>{const b=e.target.closest('[data-nav]');if(b)go(b.dataset.nav)});
-(function initView(){const h=(location.hash||'').slice(1);if(h.startsWith('ev~')){S.view='evento';S.evId=h.slice(3)}else if(h.startsWith('co~')){S.view='colab';S.coId=h.slice(3)}else if(VIEWS.some(v=>v[0]===h))S.view=h;else{try{const v=localStorage.getItem('ebf2-view');if(v&&VIEWS.some(x=>x[0]===v))S.view=v}catch(e){}}})();
+(function initView(){S.view='panel';try{localStorage.removeItem('ebf2-view')}catch(e){}try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}})();
 
 /* ===================== render ===================== */
 function render(){renderMenu();const m=document.getElementById('main');
